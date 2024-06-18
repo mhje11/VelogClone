@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: velogClone
+
+  datasource:
+    url: jdbc:mysql://localhost/velog
+    username: mhje11
+    password: 9704
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true

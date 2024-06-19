@@ -27,9 +27,14 @@ public class BlogController {
     }
 
     @PostMapping("/create")
-    public String createBlog(@ModelAttribute BlogDto blogDto, @AuthenticationPrincipal UserDetails userDetails, Model model) {
-        Blog createdBlog = blogService.createBlog(blogDto, userDetails.getUsername());
-        return "redirect:/api/blogs/" + createdBlog.getId();
+    public String createBlog(@ModelAttribute BlogDto blogDto, @AuthenticationPrincipal UserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
+        Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
+        if (blog.isEmpty()) {
+            Blog createdBlog = blogService.createBlog(blogDto, userDetails.getUsername());
+            return "redirect:/api/blogs/" + createdBlog.getId();
+        }
+        redirectAttributes.addFlashAttribute("blogExistError", "이미 블로그가 존재 합니다.");
+        return "redirect:/";
     }
 
     @GetMapping("/{blogId}")

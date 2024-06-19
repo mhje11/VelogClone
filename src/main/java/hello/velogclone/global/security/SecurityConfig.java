@@ -23,7 +23,6 @@ public class SecurityConfig {
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/**").permitAll() // 모든 사용자에게 허용하는 URL 설정
-
                 )
                 .formLogin(formLogin ->
                         formLogin
@@ -38,6 +37,7 @@ public class SecurityConfig {
                 .logout(logout ->
                         logout
                                 .logoutUrl("/api/logout") // 로그아웃 URL 설정
+                                .logoutSuccessUrl("/") //로그아웃시 index.html로 이동하도록
                                 .permitAll() // 로그아웃은 모든 사용자에게 허용
                 )
                 .csrf().disable();

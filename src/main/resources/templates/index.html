@@ -13,6 +13,9 @@
             <a th:href="@{/api/logout}">로그아웃</a>
             <a th:href="@{/api/blogs/create}">블로그 생성</a>
             <a th:href="@{/api/blogs/my}">내 블로그</a>
+            <div th:if="${blogExistError}">
+                <p th:text="${blogExistError}"></p>
+            </div>
         </div>
         <div th:unless="${#authorization.expression('isAuthenticated()')}">
             <a th:href="@{/api/login}">로그인</a>

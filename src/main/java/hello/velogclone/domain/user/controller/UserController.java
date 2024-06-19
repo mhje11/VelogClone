@@ -36,10 +36,11 @@ public class UserController {
             return "redirect:/api/login";
         } catch (Exception e) {
             log.error("오류 : {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "회원가입 중 오류가 발생했습니다.");
+            redirectAttributes.addFlashAttribute("error", "이미 존재하는 아이디나 이메일 입니다.");
             return "redirect:/api/signup";
         }
     }
+
 
     @GetMapping("/api/login")
     public String toLogin(Model model) {
@@ -59,4 +60,6 @@ public class UserController {
             redirectAttributes.addFlashAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
         }
     }
+
+
 }

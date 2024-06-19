@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>플랫폼 이름</title>
+    <title>Platform Name</title>
 </head>
 <body>
 <header>
@@ -11,6 +11,8 @@
         <div th:if="${#authorization.expression('isAuthenticated()')}">
             <p th:text="'환영합니다, ' + ${#authentication.name}"></p>
             <a th:href="@{/api/logout}">로그아웃</a>
+            <a th:href="@{/api/blogs/create}">블로그 생성</a>
+            <a th:href="@{/api/blogs/my}">내 블로그</a>
         </div>
         <div th:unless="${#authorization.expression('isAuthenticated()')}">
             <a th:href="@{/api/login}">로그인</a>
@@ -18,7 +20,18 @@
     </nav>
 </header>
 <main>
-    <h1>아직 미개발</h1>
+    <h1>환영합니다!</h1>
+    <div th:if="${error}">
+        <p th:text="${error}"></p>
+    </div>
+    <div th:unless="${error}">
+        <div th:if="${#authorization.expression('isAuthenticated()')}">
+            <p>내 블로그를 관리하거나 새로운 블로그를 생성할 수 있습니다.</p>
+        </div>
+        <div th:unless="${#authorization.expression('isAuthenticated()')}">
+            <p>블로그를 생성하려면 로그인하십시오.</p>
+        </div>
+    </div>
 </main>
 </body>
 </html>

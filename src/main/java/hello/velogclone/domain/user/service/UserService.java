@@ -7,11 +7,13 @@ import hello.velogclone.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -23,10 +25,10 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public UserDto findByLoginId(String loginId) {
-        Optional<User> optionalUser = userRepository.findByLoginId(loginId);
-        return optionalUser.map(UserDto::of).orElse(null);
-    }
+//    public UserDto findByLoginId(String loginId) {
+//        Optional<User> optionalUser = userRepository.findByLoginId(loginId);
+//        return optionalUser.map(UserDto::of).orElse(null);
+//    }
 
     private User convertToEntity(UserDto userDto) {
         User user = new User();

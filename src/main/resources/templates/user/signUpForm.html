@@ -30,6 +30,9 @@
                 <option value="ROLE_ADMIN">관리자</option>
             </select>
         </div>
+        <div th:if="${error}">
+            <p style="color: red;" th:text="${error}"></p>
+        </div>
         <div>
             <button type="submit">회원가입</button>
         </div>

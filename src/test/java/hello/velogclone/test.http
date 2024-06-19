@@ -1,0 +1,11 @@
+# 회원가입 요청
+POST http://localhost:8080/api/signup
+Content-Type: application/json
+
+{
+  "loginId": "john_doe",
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+

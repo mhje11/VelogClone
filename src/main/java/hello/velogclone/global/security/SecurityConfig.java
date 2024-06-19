@@ -37,7 +37,7 @@ public class SecurityConfig {
                 )
                 .logout(logout ->
                         logout
-                                .logoutUrl("/logout") // 로그아웃 URL 설정
+                                .logoutUrl("/api/logout") // 로그아웃 URL 설정
                                 .permitAll() // 로그아웃은 모든 사용자에게 허용
                 )
                 .csrf().disable();

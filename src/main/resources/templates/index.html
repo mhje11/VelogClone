@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>플랫폼 이름</title>
@@ -8,7 +8,13 @@
 <header>
     <nav>
         <h2>플랫폼 이름</h2>
-        <a href="/api/login">로그인</a>
+        <div th:if="${#authorization.expression('isAuthenticated()')}">
+            <p th:text="'환영합니다, ' + ${#authentication.name}"></p>
+            <a th:href="@{/api/logout}">로그아웃</a>
+        </div>
+        <div th:unless="${#authorization.expression('isAuthenticated()')}">
+            <a th:href="@{/api/login}">로그인</a>
+        </div>
     </nav>
 </header>
 <main>

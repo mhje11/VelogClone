@@ -3,6 +3,8 @@ package hello.velogclone.domain.blog.controller;
 import hello.velogclone.domain.blog.dto.BlogDto;
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.blog.service.BlogService;
+import hello.velogclone.domain.post.dto.PostResponseDto;
+import hello.velogclone.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -19,6 +22,7 @@ import java.util.Optional;
 public class BlogController {
 
     private final BlogService blogService;
+    private final PostService postService;
 
     @GetMapping("/create")
     public String createBlogForm(Model model) {
@@ -40,7 +44,9 @@ public class BlogController {
     @GetMapping("/{blogId}")
     public String getBlog(@PathVariable("blogId") Long blogId, Model model) {
         Blog blog = blogService.getBlogById(blogId);
+        List<PostResponseDto> posts = postService.findAllPostByBlogId(blogId);
         model.addAttribute("blog", blog);
+        model.addAttribute("posts", posts);
         return "blog/viewBlog";
     }
 

@@ -1,11 +1,11 @@
-package hello.velogclone.domain.Follower.entity;
+package hello.velogclone.domain.following.entity;
 
 import hello.velogclone.domain.user.entity.User;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "followers")
-public class Follower {
+@Table(name = "followings")
+public class Following {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

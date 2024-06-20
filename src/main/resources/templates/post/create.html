@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+</head>
+<body>
+
+<main>
+    <h1>새 게시글 작성</h1>
+    <form th:action="@{/api/blogs/{blogId}/create(blogId=${blogId})}" method="post">
+        <label for="title">제목:</label>
+        <input type="text" id="title" name="title" required><br><br>
+        <label for="content">내용:</label>
+        <textarea id="content" name="content" required></textarea><br><br>
+        <button type="submit">작성</button>
+    </form>
+    <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
+</main>
+</body>
+</html>

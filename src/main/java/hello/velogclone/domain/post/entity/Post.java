@@ -2,7 +2,9 @@ package hello.velogclone.domain.post.entity;
 
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.comment.entity.Comment;
+import hello.velogclone.domain.likes.entity.Likes;
 import hello.velogclone.domain.tag.entity.Tag;
+import hello.velogclone.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,10 +26,15 @@ public class Post {
     private String content;
 
     @ManyToOne
+    @JoinColumn(name = "login_id", nullable = false)
+    private User user;
+
+    @ManyToOne
     @JoinColumn(name = "blog_id")
     private Blog blog;
 
-    private Long likes = 0L;
+    @OneToMany(mappedBy = "post")
+    private List<Likes> likes;
 
     @OneToMany(mappedBy = "post")
     private List<Comment> comments;

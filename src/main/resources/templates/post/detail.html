@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${post.title}">게시글 상세보기</title>
+</head>
+<body>
+<main>
+    <h1 th:text="${post.title}">게시글 제목</h1>
+    <p th:text="${post.content}">게시글 내용</p>
+    <span th:text="'좋아요 ' + ${post.likes} + '개'">좋아요 개수</span>
+    <a th:href="@{/api/blogs/{blogId}/{postId}/update(blogId=${blogId}, postId=${post.id})}">수정</a>
+    <form th:action="@{/api/blogs/{blogId}/{postId}/delete(blogId=${blogId}, postId=${post.id})}" method="post" style="display:inline;">
+        <button type="submit">삭제</button>
+    </form>
+    <form th:action="@{/api/blogs/{blogId}/{postId}/likes(blogId=${blogId}, postId=${postId})}" method="post" style="display:inline;">
+        <button type="submit">좋아요</button>
+    </form>
+    <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
+</main>
+</body>
+</html>

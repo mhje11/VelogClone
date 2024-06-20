@@ -1,9 +1,11 @@
 package hello.velogclone.domain.user.entity;
 
-import hello.velogclone.domain.Follower.entity.Follower;
-import hello.velogclone.domain.Following.entity.Following;
+import hello.velogclone.domain.follower.entity.Follower;
+import hello.velogclone.domain.following.entity.Following;
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.comment.entity.Comment;
+import hello.velogclone.domain.likes.entity.Likes;
+import hello.velogclone.domain.post.entity.Post;
 import hello.velogclone.domain.profileimages.entity.ProfileImage;
 import jakarta.persistence.*;
 import lombok.*;
@@ -57,5 +59,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProfileImage> profileImages;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Likes> likes;
 
 }

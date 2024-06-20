@@ -15,5 +15,6 @@ public class PostRequestDto {
     private String content;
     private Long blogId;
     private User user;
+    private String tags;
 
 }

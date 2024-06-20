@@ -3,6 +3,8 @@ package hello.velogclone.domain.Series.entity;
 import hello.velogclone.domain.post.entity.Post;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "series")
 public class Series {
@@ -13,7 +15,6 @@ public class Series {
     @Column(name = "series_name")
     private String seriesName;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @OneToMany(mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
 }

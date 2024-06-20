@@ -1,5 +1,6 @@
 package hello.velogclone.domain.post.entity;
 
+import hello.velogclone.domain.Series.entity.Series;
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.comment.entity.Comment;
 import hello.velogclone.domain.likes.entity.Likes;
@@ -32,6 +33,10 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "blog_id")
     private Blog blog;
+
+    @ManyToOne
+    @JoinColumn(name = "series_id")
+    private Series series;
 
     @OneToMany(mappedBy = "post")
     private List<Likes> likes;

@@ -8,11 +8,15 @@ import hello.velogclone.domain.post.dto.PostRequestDto;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.entity.Post;
 import hello.velogclone.domain.post.repository.PostRepository;
+import hello.velogclone.domain.tag.entity.Tag;
+import hello.velogclone.domain.tag.repository.TagRepository;
+import hello.velogclone.domain.tag.service.TagService;
 import hello.velogclone.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,7 +27,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final BlogRepository blogRepository;
     private final LikeRepository likeRepository;
-
+    private final TagService tagService;
 
     @Transactional(readOnly = true)
     public List<PostResponseDto> findAllPosts() {
@@ -54,6 +58,8 @@ public class PostService {
         post.setContent(postRequestDto.getContent());
         post.setBlog(blogOptional.get());
         post.setUser(user);
+        List<Tag> tags = tagService.findOrCreateTags(postRequestDto.getTags());
+        post.setTags(tags);
         postRepository.save(post);
     }
 
@@ -87,6 +93,11 @@ public class PostService {
         Long likeCount = post.getLikes().stream()
                 .filter(likes -> likeRepository.existsById(likes.getId()))
                 .count();
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount);
+
+        List<String> tags = post.getTags().stream()
+                .map(Tag::getName)
+                .collect(Collectors.toList());
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags);
     }
+
 }

@@ -19,7 +19,7 @@ public class SecurityConfig {
         http
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/**").permitAll() // 모든 사용자에게 허용하는 URL 설정
+                                .requestMatchers("/api/**", "/css/**", "/js/**", "/").permitAll() // 모든 사용자에게 허용하는 URL 설정
                 )
                 .formLogin(formLogin ->
                         formLogin

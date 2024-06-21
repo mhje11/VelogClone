@@ -1,6 +1,7 @@
 package hello.velogclone.domain.post.controller;
 
 import hello.velogclone.domain.comment.dto.CommentCreateDto;
+import hello.velogclone.domain.comment.dto.CommentResponseDto;
 import hello.velogclone.domain.comment.entity.Comment;
 import hello.velogclone.domain.comment.service.CommentService;
 import hello.velogclone.domain.post.dto.PostRequestDto;
@@ -31,11 +32,11 @@ public class PostController {
     public String viewPost(@PathVariable("blogId") Long blogId, @PathVariable("postId") Long postId, Model model) {
         PostResponseDto post = postService.findPostById(postId);
         CommentCreateDto commentCreateDto = new CommentCreateDto();
-        List<Comment> comments = commentService.findAllCommentByPostId(postId);
+        List<CommentResponseDto> comments = commentService.findAllCommentByPostId(postId);
         model.addAttribute("post", post);
         model.addAttribute("blogId", blogId);
-        model.addAttribute("comment", commentCreateDto);
-        model.addAttribute("comments", comments);
+//        model.addAttribute("comment", commentCreateDto);
+//        model.addAttribute("comments", comments);
         return "post/detail";
     }
 

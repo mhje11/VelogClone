@@ -1,6 +1,7 @@
 package hello.velogclone.domain.comment.controller;
 
 import hello.velogclone.domain.comment.dto.CommentCreateDto;
+import hello.velogclone.domain.comment.dto.CommentResponseDto;
 import hello.velogclone.domain.comment.dto.CommentUpdateDto;
 import hello.velogclone.domain.comment.entity.Comment;
 import hello.velogclone.domain.comment.service.CommentService;
@@ -45,8 +46,8 @@ public class CommentRestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Comment>> findAllComment(@PathVariable("postId") Long postId) {
-        List<Comment> comments = commentService.findAllCommentByPostId(postId);
+    public ResponseEntity<List<CommentResponseDto>> findAllComment(@PathVariable("postId") Long postId) {
+        List<CommentResponseDto> comments = commentService.findAllCommentByPostId(postId);
         return ResponseEntity.ok(comments);
     }
 

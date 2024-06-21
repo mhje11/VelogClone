@@ -1,6 +1,7 @@
 package hello.velogclone.domain.comment.service;
 
 import hello.velogclone.domain.comment.dto.CommentCreateDto;
+import hello.velogclone.domain.comment.dto.CommentResponseDto;
 import hello.velogclone.domain.comment.dto.CommentUpdateDto;
 import hello.velogclone.domain.comment.entity.Comment;
 import hello.velogclone.domain.comment.repository.CommentRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +57,14 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<Comment> findAllCommentByPostId(Long postId) {
-        return commentRepository.findCommentByPostId(postId);
+    public List<CommentResponseDto> findAllCommentByPostId(Long postId) {
+        List<Comment> comments = commentRepository.findCommentByPostId(postId);
+        return comments.stream()
+                .map(comment -> new CommentResponseDto(
+                        comment.getId(),
+                        comment.getUser().getLoginId(),
+                        comment.getContent()
+                ))
+                .collect(Collectors.toList());
     }
 }

@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${post.title}">게시글 상세보기</title>
+    <!-- jQuery 포함 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <main data-blog-id="[[${blogId}]]" data-post-id="[[${post.id}]]">
@@ -28,15 +30,7 @@
     <div>
         <h2>댓글</h2>
         <ul id="comments-list">
-            <li th:each="comment : ${comments}" class="comment-item" data-comment-id="[[${comment.id}]]">
-                <div class="comment-content">
-                    <p th:text="${comment.user.loginId + ' : ' + comment.content}"></p>
-                    <div class="comment-actions">
-                        <button class="edit-comment-btn">수정</button>
-                        <button class="delete-comment-btn">삭제</button>
-                    </div>
-                </div>
-            </li>
+            <!-- 댓글이 여기에 동적으로 추가됩니다. -->
         </ul>
     </div>
     <!-- 댓글 작성 폼 -->
@@ -55,6 +49,37 @@
         const blogId = main.dataset.blogId;
         const postId = main.dataset.postId;
 
+        // 댓글 목록 로드
+        function loadComments() {
+            fetch(`/api/blogs/${blogId}/${postId}/comments`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('댓글 목록 로드 중 오류 발생');
+                    }
+                    return response.json();
+                })
+                .then(comments => {
+                    const commentsList = document.getElementById('comments-list');
+                    commentsList.innerHTML = '';
+                    comments.forEach(comment => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'comment-item';
+                        listItem.dataset.commentId = comment.id;
+                        listItem.innerHTML = `
+                            <div class="comment-content">
+                                <p>${comment.loginId} : ${comment.content}</p>
+                                <div class="comment-actions">
+                                    <button class="edit-comment-btn">수정</button>
+                                    <button class="delete-comment-btn">삭제</button>
+                                </div>
+                            </div>
+                        `;
+                        commentsList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error(error.message));
+        }
+
         // 댓글 작성
         document.getElementById('create-comment-form').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -71,9 +96,9 @@
                     if (!response.ok) {
                         throw new Error('댓글 생성 중 오류 발생');
                     }
-                    return response.json();
+                    return response.text();
                 })
-                .then(data => {
+                .then(() => {
                     document.getElementById('comment-content').value = '';
                     loadComments();
                 })
@@ -101,7 +126,7 @@
                             }
                             return response.json();
                         })
-                        .then(data => {
+                        .then(() => {
                             loadComments();
                         })
                         .catch(error => console.error(error.message));
@@ -129,37 +154,6 @@
                 }
             }
         });
-
-        // 댓글 목록 로드
-        function loadComments() {
-            fetch(`/api/blogs/${blogId}/${postId}/comments`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('댓글 목록 로드 중 오류 발생');
-                    }
-                    return response.json();
-                })
-                .then(comments => {
-                    const commentsList = document.getElementById('comments-list');
-                    commentsList.innerHTML = '';
-                    comments.forEach(comment => {
-                        const listItem = document.createElement('li');
-                        listItem.className = 'comment-item';
-                        listItem.dataset.commentId = comment.id;
-                        listItem.innerHTML = `
-                    <div class="comment-content">
-                        <p>${comment.user.loginId} : ${comment.content}</p>
-                        <div class="comment-actions">
-                            <button class="edit-comment-btn">수정</button>
-                            <button class="delete-comment-btn">삭제</button>
-                        </div>
-                    </div>
-                `;
-                        commentsList.appendChild(listItem);
-                    });
-                })
-                .catch(error => console.error(error.message));
-        }
 
         // 페이지 로드 시 댓글 목록 로드
         loadComments();

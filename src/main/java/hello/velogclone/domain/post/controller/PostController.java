@@ -4,6 +4,7 @@ import hello.velogclone.domain.post.dto.PostRequestDto;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.service.PostService;
 import hello.velogclone.domain.user.entity.User;
+import hello.velogclone.domain.user.repository.UserRepository;
 import hello.velogclone.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,14 +13,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/api/blogs/{blogId}")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
 
     @GetMapping("/{postId}")
@@ -38,7 +37,7 @@ public class PostController {
 
     @PostMapping("/create")
     public String createPost(@PathVariable("blogId") Long blogId, @ModelAttribute PostRequestDto postRequestDto, @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService.findByLoginId(userDetails.getUsername());
+        User user = userRepository.findByLoginId(userDetails.getUsername()).get();
         postRequestDto.setBlogId(blogId);
         postService.createPost(postRequestDto, user);
         return "redirect:/api/blogs/" + blogId;

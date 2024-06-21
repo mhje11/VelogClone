@@ -2,21 +2,18 @@ package hello.velogclone.domain.post.service;
 
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.blog.repository.BlogRepository;
-import hello.velogclone.domain.likes.entity.Likes;
 import hello.velogclone.domain.likes.repository.LikeRepository;
 import hello.velogclone.domain.post.dto.PostRequestDto;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.entity.Post;
 import hello.velogclone.domain.post.repository.PostRepository;
 import hello.velogclone.domain.tag.entity.Tag;
-import hello.velogclone.domain.tag.repository.TagRepository;
 import hello.velogclone.domain.tag.service.TagService;
 import hello.velogclone.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

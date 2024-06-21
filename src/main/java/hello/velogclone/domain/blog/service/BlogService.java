@@ -37,13 +37,10 @@ public class BlogService {
         Blog blog = optionalBlog.get();
         blog.setTitle(blogDto.getTitle());
         blogRepository.save(blog);
-
     }
 
     public Blog getBlogById(Long blogId) {
         return blogRepository.findById(blogId).orElse(null);
     }
-
-
 
 }

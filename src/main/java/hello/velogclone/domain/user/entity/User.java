@@ -1,7 +1,5 @@
 package hello.velogclone.domain.user.entity;
 
-import hello.velogclone.domain.follower.entity.Follower;
-import hello.velogclone.domain.following.entity.Following;
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.comment.entity.Comment;
 import hello.velogclone.domain.likes.entity.Likes;
@@ -50,11 +48,7 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Blog blog;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Follower> followers;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Following> followings;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProfileImage> profileImages;

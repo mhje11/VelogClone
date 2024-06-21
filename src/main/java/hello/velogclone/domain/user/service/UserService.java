@@ -25,10 +25,10 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User findByLoginId(String loginId) {
-        Optional<User> optionalUser = userRepository.findByLoginId(loginId);
-        return optionalUser.get();
-    }
+//    public User findByLoginId(String loginId) {
+//        Optional<User> optionalUser = userRepository.findByLoginId(loginId);
+//        return optionalUser.get();
+//    }
 
     private User convertToEntity(UserDto userDto) {
         User user = new User();

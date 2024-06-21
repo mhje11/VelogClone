@@ -3,6 +3,7 @@ package hello.velogclone.domain.blog.controller;
 import hello.velogclone.domain.blog.dto.BlogDto;
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.blog.service.BlogService;
+import hello.velogclone.domain.follow.service.FollowService;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class BlogController {
 
     private final BlogService blogService;
     private final PostService postService;
+    private final FollowService followService;
 
     @GetMapping("/create")
     public String createBlogForm(Model model) {
@@ -47,6 +49,8 @@ public class BlogController {
         List<PostResponseDto> posts = postService.findAllPostByBlogId(blogId);
         model.addAttribute("blog", blog);
         model.addAttribute("posts", posts);
+        model.addAttribute("followingCount", followService.getFollowingCount(blogId));
+        model.addAttribute("followerCount", followService.getFollowerCount(blogId));
         return "blog/viewBlog";
     }
 

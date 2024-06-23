@@ -43,41 +43,51 @@
     </div>
 </main>
 
-<script>
+<script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
-        const main = document.querySelector('main');
-        const blogId = main.dataset.blogId;
-        const postId = main.dataset.postId;
+        const blogId = /*[[${blogId}]]*/ 'defaultBlogId'; // Thymeleaf가 여기를 JavaScript로 변환
+        const postId = /*[[${post.id}]]*/ 'defaultPostId'; // Thymeleaf가 여기를 JavaScript로 변환
+
 
         // 댓글 목록 로드
         function loadComments() {
-            fetch(`/api/blogs/${blogId}/${postId}/comments`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('댓글 목록 로드 중 오류 발생');
-                    }
-                    return response.json();
-                })
-                .then(comments => {
-                    const commentsList = document.getElementById('comments-list');
-                    commentsList.innerHTML = '';
-                    comments.forEach(comment => {
-                        const listItem = document.createElement('li');
-                        listItem.className = 'comment-item';
-                        listItem.dataset.commentId = comment.id;
-                        listItem.innerHTML = `
-                            <div class="comment-content">
-                                <p>${comment.loginId} : ${comment.content}</p>
-                                <div class="comment-actions">
-                                    <button class="edit-comment-btn">수정</button>
-                                    <button class="delete-comment-btn">삭제</button>
+            const commentsList = document.getElementById('comments-list');
+
+            console.log(blogId)
+            console.log(postId)
+
+            if (commentsList) {
+                console.log('comments-list element found.');
+
+                fetch(`/api/blogs/${blogId}/${postId}/comments`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('댓글 목록 로드 중 오류 발생');
+                        }
+                        return response.json();
+                    })
+                    .then(comments => {
+                        commentsList.innerHTML = '';
+                        comments.forEach(comment => {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'comment-item';
+                            listItem.dataset.commentId = comment.id;
+                            listItem.innerHTML = `
+                                <div class="comment-content">
+                                    <p>${comment.loginId} : ${comment.content}</p>
+                                    <div class="comment-actions">
+                                        <button class="edit-comment-btn">수정</button>
+                                        <button class="delete-comment-btn">삭제</button>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
-                        commentsList.appendChild(listItem);
-                    });
-                })
-                .catch(error => console.error(error.message));
+                            `;
+                            commentsList.appendChild(listItem);
+                        });
+                    })
+                    .catch(error => console.error(error.message));
+            } else {
+                console.error('comments-list element not found.');
+            }
         }
 
         // 댓글 작성

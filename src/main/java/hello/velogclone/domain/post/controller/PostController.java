@@ -31,8 +31,8 @@ public class PostController {
     @GetMapping("/{postId}")
     public String viewPost(@PathVariable("blogId") Long blogId, @PathVariable("postId") Long postId, Model model) {
         PostResponseDto post = postService.findPostById(postId);
-        CommentCreateDto commentCreateDto = new CommentCreateDto();
-        List<CommentResponseDto> comments = commentService.findAllCommentByPostId(postId);
+//        CommentCreateDto commentCreateDto = new CommentCreateDto();
+//        List<CommentResponseDto> comments = commentService.findAllCommentByPostId(postId);
         model.addAttribute("post", post);
         model.addAttribute("blogId", blogId);
 //        model.addAttribute("comment", commentCreateDto);

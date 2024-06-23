@@ -26,13 +26,13 @@ public class FollowRestController {
         return ResponseEntity.ok("블로그를 팔로우했습니다.");
     }
 
-    @GetMapping("/follower")
+    @GetMapping("/follower/List")
     public ResponseEntity<List<FollowDto>> getFollowers(@PathVariable("blogId") Long blogId) {
         List<FollowDto> followers = followService.findAllFollowers(blogId);
         return ResponseEntity.ok(followers);
     }
 
-    @GetMapping("/following")
+    @GetMapping("/following/List")
     public ResponseEntity<List<FollowDto>> getFollowings(@PathVariable("blogId") Long blogId) {
         List<FollowDto> followings = followService.findAllFollowingsByBlogId(blogId);
         return ResponseEntity.ok(followings);

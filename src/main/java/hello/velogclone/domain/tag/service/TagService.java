@@ -1,5 +1,7 @@
 package hello.velogclone.domain.tag.service;
 
+import hello.velogclone.domain.post.entity.Post;
+import hello.velogclone.domain.post.service.PostService;
 import hello.velogclone.domain.tag.entity.Tag;
 import hello.velogclone.domain.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,12 @@ public class TagService {
         }
         return tags;
     }
+
+    @Transactional(readOnly = true)
+    public List<Tag> findTagByPostId(Long postId) {
+        return tagRepository.findTagsByPostId(postId);
+    }
+
     @Transactional
     public Tag createTag(String name) {
         Tag tag = new Tag(name);

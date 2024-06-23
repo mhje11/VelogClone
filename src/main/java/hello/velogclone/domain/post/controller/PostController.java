@@ -7,6 +7,8 @@ import hello.velogclone.domain.comment.service.CommentService;
 import hello.velogclone.domain.post.dto.PostRequestDto;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.service.PostService;
+import hello.velogclone.domain.tag.entity.Tag;
+import hello.velogclone.domain.tag.service.TagService;
 import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.domain.user.repository.UserRepository;
 import hello.velogclone.domain.user.service.UserService;
@@ -25,18 +27,16 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
     private final UserRepository userRepository;
-    private final CommentService commentService;
+    private final TagService tagService;
 
 
     @GetMapping("/{postId}")
     public String viewPost(@PathVariable("blogId") Long blogId, @PathVariable("postId") Long postId, Model model) {
         PostResponseDto post = postService.findPostById(postId);
-//        CommentCreateDto commentCreateDto = new CommentCreateDto();
-//        List<CommentResponseDto> comments = commentService.findAllCommentByPostId(postId);
+        List<Tag> tags = tagService.findTagByPostId(postId);
         model.addAttribute("post", post);
         model.addAttribute("blogId", blogId);
-//        model.addAttribute("comment", commentCreateDto);
-//        model.addAttribute("comments", comments);
+        model.addAttribute("tags", tags);
         return "post/detail";
     }
 

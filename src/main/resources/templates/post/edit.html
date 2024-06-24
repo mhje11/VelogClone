@@ -5,16 +5,59 @@
     <title th:text="'게시글 수정 - ' + ${post.title}">게시글 수정</title>
 </head>
 <body>
-<main>
+<main data-blog-id="[[${blogId}]]" data-post-id="[[${postId}]]">
     <h1 th:text="'게시글 수정 - ' + ${post.title}">게시글 수정</h1>
-    <form th:action="@{/api/blogs/{blogId}/{postId}/update(blogId=${blogId}, postId=${postId})}" method="post">
+    <form id="update-post-form">
         <label for="title">제목:</label>
         <input type="text" id="title" name="title" th:value="${post.title}" required><br><br>
         <label for="content">내용:</label>
         <textarea id="content" name="content" required th:text="${post.content}"></textarea><br><br>
+        <label for="tags">태그:</label>
+        <input type="text" id="tags" name="tags" class="tag-input" placeholder="#태그1 #태그2" th:value="${post.tags}"><br><br>
         <button type="submit">수정</button>
     </form>
     <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
 </main>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const mainElement = document.querySelector('main');
+        const blogId = /*[[${blogId}]]*/ 'defaultBlogId'; // Thymeleaf가 여기를 JavaScript로 변환
+        const postId = /*[[${post.id}]]*/ 'defaultPostId'; // Thymeleaf가 여기를 JavaScript로 변환
+        console.log(blogId);
+        console.log(postId);/*[[${blogId}]]*/
+
+        document.getElementById('update-post-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const tags = document.getElementById('tags').value;
+
+            // Fetch 요청을 사용하여 업데이트 요청을 보냅니다.
+            fetch(`/api/blogs/${blogId}/posts/${postId}/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    content: content,
+                    tags: tags.split(/\s+/).filter(tag => tag) // 태그를 공백으로 분리하여 배열로 보냄
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('수정 중 오류 발생');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('수정 완료');
+                    window.location.href = `/api/blogs/${blogId}`; // 목록 페이지로 리다이렉트
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
 </body>
 </html>

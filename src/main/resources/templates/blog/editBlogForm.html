@@ -2,21 +2,92 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Blog</title>
+    <title>블로그 수정</title>
+    <style>
+        .post-actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
 
-<main>
+<main data-blog-id="[[${blogId}]]">
     <h1>블로그 수정</h1>
-    <form method="post" th:action="@{|/api/blogs/${blogId}/edit|}" th:object="${blog}">
+    <form th:action="@{/api/blogs/{blogId}/edit(blogId=${blogId})}" method="post">
         <div>
             <label for="title">블로그 제목:</label>
-            <input type="text" id="title" name="title" th:field="*{title}">
+            <input type="text" id="title" name="title" required th:value="${blog.title}">
         </div>
         <div>
             <button type="submit">저장</button>
         </div>
     </form>
+
+    <h2>게시글 목록</h2>
+    <ul id="posts-list">
+        <!-- 게시글 목록이 여기에 동적으로 추가됩니다. -->
+    </ul>
 </main>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const blogId = /*[[${blogId}]]*/ 'defaultBlogId'; // Thymeleaf가 여기를 JavaScript로 변환
+
+        // 게시글 목록을 불러오는 함수
+        function loadPosts() {
+            fetch(`/api/blogs/${blogId}/edit/post`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('게시글 목록 로드 중 오류 발생');
+                    }
+                    return response.json();
+                })
+                .then(posts => {
+                    const postsList = document.getElementById('posts-list');
+                    postsList.innerHTML = '';
+                    posts.forEach(post => {
+                        const listItem = document.createElement('li');
+                        listItem.dataset.postId = post.id;
+                        listItem.innerHTML = `
+                            <span>${post.title}</span>
+                            <div class="post-actions">
+                                <a href="/api/blogs/${blogId}/${post.id}/update" class="edit-post-btn">수정</a>
+                                <button type="button" class="delete-post-btn">삭제</button>
+                            </div>
+                        `;
+                        postsList.appendChild(listItem);
+                    });
+
+                    // 게시글 삭제 버튼 이벤트 추가
+                    const deleteButtons = document.querySelectorAll('.delete-post-btn');
+                    deleteButtons.forEach(button => {
+                        button.addEventListener('click', function(event) {
+                            const postId = this.closest('li').dataset.postId;
+                            deletePost(postId);
+                        });
+                    });
+                })
+                .catch(error => console.error(error.message));
+        }
+
+        // 게시글 삭제 함수
+        function deletePost(postId) {
+            fetch(`/api/blogs/${blogId}/edit/post/${postId}/delete`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('게시글 삭제 중 오류 발생');
+                    }
+                    loadPosts();
+                })
+                .catch(error => console.error(error.message));
+        }
+
+        // 페이지 로드 시 게시글 목록 로드
+        loadPosts();
+    });
+</script>
 </body>
 </html>

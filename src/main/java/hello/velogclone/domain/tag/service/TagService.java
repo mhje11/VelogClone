@@ -20,11 +20,11 @@ public class TagService {
     private final TagRepository tagRepository;
 
     @Transactional
-    public List<Tag> findOrCreateTags(String tagsStr) {
-        if (tagsStr == null || tagsStr.isEmpty()) {
+    public List<Tag> findOrCreateTags(List<String> tagNames) {
+        if (tagNames == null || tagNames.isEmpty()) {
             return new ArrayList<>();
         }
-        String[] tagNames = tagsStr.split("\\s+");
+
         List<Tag> tags = new ArrayList<>();
         for (String tagName : tagNames) {
             if (tagName.startsWith("#")) {

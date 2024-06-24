@@ -8,6 +8,7 @@ import hello.velogclone.domain.tag.entity.Tag;
 import hello.velogclone.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 @Getter@Setter
+@RequiredArgsConstructor
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

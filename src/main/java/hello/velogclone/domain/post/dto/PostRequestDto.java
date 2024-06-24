@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,6 +17,6 @@ public class PostRequestDto {
     private String content;
     private Long blogId;
     private User user;
-    private String tags;
+    private List<String> tags;
 
 }

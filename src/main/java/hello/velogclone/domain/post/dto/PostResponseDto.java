@@ -1,11 +1,13 @@
 package hello.velogclone.domain.post.dto;
 
+import hello.velogclone.domain.post.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -18,4 +20,11 @@ public class PostResponseDto {
     private Long blogId;
     private Long likes;
     List<String> tags;
+
+    public PostResponseDto(Post post) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.tags = post.getTags().stream().map(tag -> "#" + tag.getName()).collect(Collectors.toList());
+    }
 }

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,24 +50,32 @@ public class PostService {
 
     @Transactional
     public void createPost(PostRequestDto postRequestDto, User user) {
-        Optional<Blog> blogOptional = blogRepository.findById(postRequestDto.getBlogId());
+        Optional<Blog> blogOptional = blogRepository.findById(user.getBlog().getId());
         Post post = new Post();
         post.setTitle(postRequestDto.getTitle());
         post.setContent(postRequestDto.getContent());
         post.setBlog(blogOptional.get());
         post.setUser(user);
-        List<Tag> tags = tagService.findOrCreateTags(postRequestDto.getTags());
+        List<String> tagNames = postRequestDto.getTags();
+        List<Tag> tags = new ArrayList<>();
+        if (tagNames != null && !tagNames.isEmpty()) {
+            tags = tagService.findOrCreateTags(tagNames);
+        }
         post.setTags(tags);
         postRepository.save(post);
     }
 
     @Transactional
-    public void updatePost(Long id, PostRequestDto postRequestDto) {
-        Optional<Post> postOptional = postRepository.findById(id);
-        Post post = postOptional.get();
-        post.setTitle(postRequestDto.getTitle());
-        post.setContent(postRequestDto.getContent());
-        postRepository.save(post);
+    public void updatePost(Long id, Post post, String loginId) {
+        Post existingPost = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        if (!existingPost.getUser().getLoginId().equals(loginId)) {
+            throw new SecurityException("권한이 없습니다.");
+        }
+        existingPost.setTitle(post.getTitle());
+        existingPost.setContent(post.getContent());
+        List<Tag> tags = tagService.findOrCreateTags(post.getTags().stream().map(Tag::getName).toList());
+        existingPost.setTags(tags);
+        postRepository.save(existingPost);
     }
 
     @Transactional

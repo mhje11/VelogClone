@@ -1,5 +1,6 @@
 package hello.velogclone.domain.post.dto;
 
+import hello.velogclone.domain.Series.entity.Series;
 import hello.velogclone.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,5 +19,6 @@ public class PostRequestDto {
     private Long blogId;
     private User user;
     private List<String> tags;
+    private Series series;
 
 }

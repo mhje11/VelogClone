@@ -3,7 +3,9 @@ package hello.velogclone.domain.Series.entity;
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.post.entity.Post;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.List;
 @Entity
 @Table(name = "series")
 @Getter@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Series {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -62,6 +62,7 @@ public class PostService {
             tags = tagService.findOrCreateTags(tagNames);
         }
         post.setTags(tags);
+        post.setSeries(postRequestDto.getSeries());
         postRepository.save(post);
     }
 
@@ -103,7 +104,9 @@ public class PostService {
         List<String> tags = post.getTags().stream()
                 .map(Tag::getName)
                 .collect(Collectors.toList());
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags);
+        String seriesName = post.getSeries() != null ? post.getSeries().getSeriesName() : "";
+
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags, seriesName);
     }
 
 }

@@ -54,11 +54,6 @@ public class FollowService {
                 .collect(Collectors.toList());
     }
 
-//    @Transactional(readOnly = true)
-//    public List<Follow> findAllFollowings(String loginId) {
-//        User user = userRepository.findByLoginId(loginId).get();
-//        return followRepository.findByUser(user);
-//    }
 
     @Transactional(readOnly = true)
     public int getFollowingCount(Long blogId) {

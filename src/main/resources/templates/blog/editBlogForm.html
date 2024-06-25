@@ -8,11 +8,15 @@
             display: flex;
             gap: 10px;
         }
+        .series-actions {
+            display: flex;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
 
-<main data-blog-id="[[${blogId}]]">
+<main data-blog-id="[[${blogId}]]" data-series-id="[[${series.id}]]">
     <h1>블로그 수정</h1>
     <form th:action="@{/api/blogs/{blogId}/edit(blogId=${blogId})}" method="post">
         <div>
@@ -28,10 +32,21 @@
     <ul id="posts-list">
         <!-- 게시글 목록이 여기에 동적으로 추가됩니다. -->
     </ul>
+
+    <h2>시리즈 관리</h2>
+    <ul id="series-list">
+        <!-- 시리즈 목록이 여기에 동적으로 추가됩니다. -->
+    </ul>
+    <form id="create-series-form">
+        <label for="series-name">시리즈 이름:</label>
+        <input type="text" id="series-name" name="seriesName" required>
+        <button type="submit">시리즈 생성</button>
+    </form>
 </main>
 
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
+        const mainElement = document.querySelector('main');
         const blogId = /*[[${blogId}]]*/ 'defaultBlogId'; // Thymeleaf가 여기를 JavaScript로 변환
 
         // 게시글 목록을 불러오는 함수
@@ -50,12 +65,12 @@
                         const listItem = document.createElement('li');
                         listItem.dataset.postId = post.id;
                         listItem.innerHTML = `
-                            <span>${post.title}</span>
-                            <div class="post-actions">
-                                <a href="/api/blogs/${blogId}/${post.id}/update" class="edit-post-btn">수정</a>
-                                <button type="button" class="delete-post-btn">삭제</button>
-                            </div>
-                        `;
+                        <span>${post.title}</span>
+                        <div class="post-actions">
+                            <a href="/api/blogs/${blogId}/${post.id}/update" class="edit-post-btn">수정</a>
+                            <button type="button" class="delete-post-btn">삭제</button>
+                        </div>
+                    `;
                         postsList.appendChild(listItem);
                     });
 
@@ -85,9 +100,83 @@
                 .catch(error => console.error(error.message));
         }
 
-        // 페이지 로드 시 게시글 목록 로드
+        // 시리즈 목록을 불러오는 함수
+        function loadSeries() {
+            const mainElement = document.querySelector('main');
+            fetch(`/api/blogs/${blogId}/edit/series`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('시리즈 목록 로드 중 오류 발생');
+                    }
+                    return response.json();
+                })
+                .then(series => {
+                    const seriesList = document.getElementById('series-list');
+                    seriesList.innerHTML = '';
+                    series.forEach(serie => {
+                        const listItem = document.createElement('li');
+                        listItem.dataset.seriesId = serie.id;
+                        listItem.innerHTML = `
+                        <span>${serie.seriesName}</span>
+                        <div class="series-actions">
+                            <button type="button" class="delete-series-btn">삭제</button>
+                        </div>
+                    `;
+                        seriesList.appendChild(listItem);
+                    });
+
+                    // 시리즈 삭제 버튼 이벤트 추가
+                    const deleteButtons = document.querySelectorAll('.delete-series-btn');
+                    deleteButtons.forEach(button => {
+                        button.addEventListener('click', function(event) {
+                            const seriesId = this.closest('li').dataset.seriesId;
+                            deleteSeries(seriesId);
+                        });
+                    });
+                })
+                .catch(error => console.error(error.message));
+        }
+
+        // 시리즈 삭제 함수
+        function deleteSeries(seriesId) {
+            fetch(`/api/blogs/${blogId}/edit/series/delete/${seriesId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('시리즈 삭제 중 오류 발생');
+                    }
+                    window.location.reload(); // 페이지 새로고침
+                })
+                .catch(error => console.error(error.message));
+        }
+
+        // 시리즈 생성 함수
+        document.getElementById('create-series-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const seriesName = document.getElementById('series-name').value;
+
+            fetch(`/api/blogs/${blogId}/edit/series/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ seriesName: seriesName })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('시리즈 생성 중 오류 발생');
+                    }
+                    window.location.reload(); // 페이지 새로고침
+                })
+                .catch(error => console.error(error.message));
+        });
+
+        // 페이지 로드 시 게시글 목록 및 시리즈 목록 로드
+        loadSeries();
         loadPosts();
     });
+
 </script>
 </body>
 </html>

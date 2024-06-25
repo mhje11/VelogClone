@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<main>
+<main data-blog-id="[[${blogId}]]">
     <h1>새 게시글 작성</h1>
     <form th:action="@{/api/blogs/{blogId}/create(blogId=${blogId})}" method="post" th:object="${post}">
         <label for="title">제목:</label>
@@ -15,9 +15,44 @@
         <textarea id="content" name="content" required th:field="*{content}"></textarea><br><br>
         <label for="tags">태그:</label>
         <input type="text" id="tags" name="tags" class="tag-input" placeholder="#태그1 #태그2" th:field="*{tags}"><br><br>
+        <label for="series">시리즈:</label>
+        <select id="series" name="series">
+            <!-- 시리즈 목록이 여기에 동적으로 추가됩니다. -->
+        </select><br><br>
         <button type="submit">작성</button>
     </form>
     <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
 </main>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const blogId = /*[[${blogId}]]*/ 'defaultBlogId'; // Thymeleaf가 여기를 JavaScript로 변환
+
+        // 시리즈 목록을 불러오는 함수
+        function loadSeries() {
+            fetch(`/api/blogs/${blogId}/edit/series`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('시리즈 목록 로드 중 오류 발생');
+                    }
+                    return response.json();
+                })
+                .then(series => {
+                    const seriesSelect = document.getElementById('series');
+                    seriesSelect.innerHTML = '<option value="">시리즈 선택</option>';
+                    series.forEach(serie => {
+                        const option = document.createElement('option');
+                        option.value = serie.id;
+                        option.textContent = serie.seriesName;
+                        seriesSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // 페이지 로드 시 시리즈 목록 로드
+        loadSeries();
+    });
+</script>
 </body>
 </html>

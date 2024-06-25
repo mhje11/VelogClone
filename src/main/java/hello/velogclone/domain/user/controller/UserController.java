@@ -51,11 +51,9 @@ public class UserController {
     @PostMapping("/api/login")
     public void login(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
         try {
-            // 사용자 인증 처리
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getLoginId());
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, user.getPassword(), userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            //로그인후 리다이렉트할 url security config 에서 처리
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
         }

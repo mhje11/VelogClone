@@ -6,7 +6,6 @@ import hello.velogclone.domain.post.entity.Post;
 import hello.velogclone.domain.post.service.PostService;
 import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.domain.user.repository.UserRepository;
-import hello.velogclone.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

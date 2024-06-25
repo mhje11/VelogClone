@@ -1,6 +1,7 @@
 package hello.velogclone.domain.post.controller;
 
 
+import hello.velogclone.domain.Series.service.SeriesService;
 import hello.velogclone.domain.post.dto.PostRequestDto;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.service.PostService;
@@ -9,7 +10,6 @@ import hello.velogclone.domain.tag.service.TagService;
 import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -25,10 +25,13 @@ public class PostController {
     private final PostService postService;
     private final UserRepository userRepository;
     private final TagService tagService;
+    private final SeriesService seriesService;
 
 
     @GetMapping("/{postId}")
-    public String viewPost(@PathVariable("blogId") Long blogId, @PathVariable("postId") Long postId, Model model) {
+    public String viewPost(@PathVariable("blogId") Long blogId,
+                           @PathVariable("postId") Long postId,
+                           Model model) {
         PostResponseDto post = postService.findPostById(postId);
         List<Tag> tags = tagService.findTagByPostId(postId);
         model.addAttribute("post", post);
@@ -38,7 +41,8 @@ public class PostController {
     }
 
     @GetMapping("/create")
-    public String createForm(@PathVariable("blogId") Long blogId, Model model) {
+    public String createForm(@PathVariable("blogId") Long blogId,
+                             Model model) {
         PostRequestDto post = new PostRequestDto();
         model.addAttribute("blogId", blogId);
         model.addAttribute("post", post);
@@ -46,7 +50,9 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public String createPost(@PathVariable("blogId") Long blogId, @ModelAttribute PostRequestDto postRequestDto, @AuthenticationPrincipal UserDetails userDetails) {
+    public String createPost(@PathVariable("blogId") Long blogId,
+                             @ModelAttribute PostRequestDto postRequestDto,
+                             @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByLoginId(userDetails.getUsername()).get();
         postRequestDto.setBlogId(blogId);
         postService.createPost(postRequestDto, user);
@@ -54,7 +60,9 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/update")
-    public String editForm(@PathVariable("postId") Long postId, @PathVariable("blogId") Long blogId, Model model) {
+    public String editForm(@PathVariable("postId") Long postId,
+                           @PathVariable("blogId") Long blogId,
+                           Model model) {
         PostResponseDto post = postService.findPostById(postId);
         model.addAttribute("post", post);
         model.addAttribute("blogId", blogId);
@@ -64,7 +72,9 @@ public class PostController {
 
 
     @PostMapping("/{postId}/delete")
-    public String deletePost(@PathVariable("blogId") Long blogId, @PathVariable("postId") Long postId, @AuthenticationPrincipal UserDetails userDetails) {
+    public String deletePost(@PathVariable("blogId") Long blogId,
+                             @PathVariable("postId") Long postId,
+                             @AuthenticationPrincipal UserDetails userDetails) {
         postService.deletePost(postId, userDetails.getUsername());
         return "redirect:/api/blogs/" + blogId;
     }

@@ -20,11 +20,14 @@ public class PostResponseDto {
     private Long blogId;
     private Long likes;
     List<String> tags;
+    private String series;
+
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.tags = post.getTags().stream().map(tag -> "#" + tag.getName()).collect(Collectors.toList());
+        this.series = post.getSeries() != null ? post.getSeries().getSeriesName() : "";
     }
 }

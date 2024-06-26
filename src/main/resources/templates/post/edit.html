@@ -21,6 +21,16 @@
 
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
+        /*<![CDATA[*/
+        const error = /*[[${error}]]*/ 'null';
+        if (error !== null) {
+            alert(error);
+        }
+        /*]]>*/
+    });
+</script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
         const mainElement = document.querySelector('main');
         const blogId = /*[[${blogId}]]*/ 'defaultBlogId'; // Thymeleaf가 여기를 JavaScript로 변환
         const postId = /*[[${post.id}]]*/ 'defaultPostId'; // Thymeleaf가 여기를 JavaScript로 변환

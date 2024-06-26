@@ -29,28 +29,23 @@ public class BlogController {
     private final FollowService followService;
 
     @GetMapping("/create")
-    public String createBlogForm(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            if (userDetails == null) {
-                throw new UnauthorizedException("로그인후 사용 가능한 기능입니다.");
-            }
-            model.addAttribute("blog", new BlogDto());
-            return "blog/createBlogForm";
-        } catch (UnauthorizedException e) {
-            model.addAttribute("error", e.getMessage());
+    public String createBlogForm(Model model, @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("error", "로그인 후 사용 가능한 기능입니다.");
             return "redirect:/api/login";
         }
-
+        model.addAttribute("blog", new BlogDto());
+        return "blog/createBlogForm";
     }
 
     @PostMapping("/create")
-    public String createBlog(@ModelAttribute BlogDto blogDto, @AuthenticationPrincipal UserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
+    public String createBlog(@ModelAttribute BlogDto blogDto, @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
         Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
         if (blog.isEmpty()) {
             Blog createdBlog = blogService.createBlog(blogDto, userDetails.getUsername());
             return "redirect:/api/blogs/" + createdBlog.getId();
         }
-        redirectAttributes.addFlashAttribute("blogExistError", "이미 블로그가 존재 합니다.");
+        redirectAttributes.addFlashAttribute("error", "이미 블로그가 존재 합니다.");
         return "redirect:/";
     }
 
@@ -67,25 +62,20 @@ public class BlogController {
 
     @GetMapping("/my")
     public String getMyBlog(@AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
-        try {
-            if (userDetails == null) {
-                throw new UnauthorizedException("로그인후 사용 가능한 기능입니다.");
-            }
-            Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
-            if (blog.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "먼저 블로그를 생성하세요");
-                return "redirect:/";
-            }
-            return "redirect:/api/blogs/" + blog.get().getId();
-        } catch (UnauthorizedException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("error", "로그인 후 사용 가능한 기능입니다.");
             return "redirect:/api/login";
         }
-
+        Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
+        if (blog.isEmpty()) {
+            redirectAttributes.addFlashAttribute("blogExistError", "먼저 블로그를 생성하세요");
+            return "redirect:/";
+        }
+        return "redirect:/api/blogs/" + blog.get().getId();
     }
 
     @GetMapping("/{blogId}/edit")
-    public String editBlogForm(@PathVariable("blogId") Long blogId, @AuthenticationPrincipal UserDetails userDetails, Model model) {
+    public String editBlogForm(@PathVariable("blogId") Long blogId, @AuthenticationPrincipal UserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
         try {
             Blog blog = blogService.getBlogById(blogId);
             if (!blog.getUser().getLoginId().equals(userDetails.getUsername())) {
@@ -97,10 +87,9 @@ public class BlogController {
             model.addAttribute("blogId", blogId);
             return "blog/editBlogForm";
         } catch (UnauthorizedException e) {
-            model.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/api/blogs/" + blogId;
         }
-
     }
 
     @PostMapping("/{blogId}/edit")
@@ -109,3 +98,4 @@ public class BlogController {
         return "redirect:/api/blogs/" + blogId;
     }
 }
+

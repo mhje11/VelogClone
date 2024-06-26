@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +47,8 @@ public class PostController {
 
     @GetMapping("/create")
     public String createForm(@PathVariable("blogId") Long blogId,
-                             Model model, @AuthenticationPrincipal UserDetails userDetails) {
+                             Model model, @AuthenticationPrincipal UserDetails userDetails
+    , RedirectAttributes redirectAttributes) {
         try {
             Blog blog = checkBlogAndUser(blogId, userDetails);
             PostRequestDto post = new PostRequestDto();
@@ -54,10 +56,10 @@ public class PostController {
             model.addAttribute("post", post);
             return "post/create";
         } catch (UnauthorizedException e) {
-            model.addAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/api/blogs/" + blogId;
         } catch (BlogNotFoundException e) {
-            model.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/";
         }
     }
@@ -77,7 +79,8 @@ public class PostController {
     public String editForm(@PathVariable("postId") Long postId,
                            @PathVariable("blogId") Long blogId,
                            Model model,
-                           @AuthenticationPrincipal UserDetails userDetails) {
+                           @AuthenticationPrincipal UserDetails userDetails
+    , RedirectAttributes redirectAttributes) {
         try {
             Blog blog = checkBlogAndUser(blogId, userDetails);
             PostResponseDto post = postService.findPostById(postId);
@@ -89,10 +92,10 @@ public class PostController {
             model.addAttribute("postId", postId);
             return "post/edit";
         } catch (UnauthorizedException e) {
-            model.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/api/blogs/" + blogId;
         } catch (BlogNotFoundException | PostNotFoundException e) {
-            model.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/";
         }
     }
@@ -101,16 +104,17 @@ public class PostController {
     public String deletePost(@PathVariable("blogId") Long blogId,
                              @PathVariable("postId") Long postId,
                              @AuthenticationPrincipal UserDetails userDetails,
-                             Model model) {
+                             Model model
+    , RedirectAttributes redirectAttributes) {
         try {
             Blog blog = checkBlogAndUser(blogId, userDetails);
             postService.deletePost(postId, userDetails.getUsername());
             return "redirect:/api/blogs/" + blogId;
         } catch (UnauthorizedException e) {
-            model.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/api/blogs/" + blogId;
         } catch (BlogNotFoundException e) {
-            model.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/";
         }
     }

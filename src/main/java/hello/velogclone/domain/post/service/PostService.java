@@ -35,6 +35,14 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    public List<PostResponseDto> findAllByBlogIdAndTemporal(Long blogId, boolean temporal) {
+        List<PostResponseDto> post = postRepository.findAllByBlogIdAndTemporal(blogId, temporal).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        return post;
+    }
+
+    @Transactional(readOnly = true)
     public List<PostResponseDto> findAllPostByBlogId(Long blogId) {
         return postRepository.findAllByBlogId(blogId).stream()
                 .map(this::convertToDto)
@@ -56,6 +64,7 @@ public class PostService {
         post.setContent(postRequestDto.getContent());
         post.setBlog(blogOptional.get());
         post.setUser(user);
+        post.setTemporal(postRequestDto.isTemporal());
         List<String> tagNames = postRequestDto.getTags();
         List<Tag> tags = new ArrayList<>();
         if (tagNames != null && !tagNames.isEmpty()) {
@@ -106,7 +115,7 @@ public class PostService {
                 .collect(Collectors.toList());
         String seriesName = post.getSeries() != null ? post.getSeries().getSeriesName() : "";
 
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags, seriesName);
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags ,seriesName, post.isTemporal());
     }
 
 }

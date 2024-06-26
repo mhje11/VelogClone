@@ -19,9 +19,11 @@ public class PostRestController {
 
     @GetMapping("/api/blogs/{blogId}/edit/post")
     public ResponseEntity<List<PostResponseDto>> findAllPost(@PathVariable("blogId") Long blogId) {
-        List<PostResponseDto> blogs = postService.findAllPostByBlogId(blogId);
-        return ResponseEntity.ok(blogs);
+        List<PostResponseDto> posts = postService.findAllPostByBlogId(blogId);
+        return ResponseEntity.ok(posts);
     }
+
+
 
     @DeleteMapping("/api/blogs/{blogId}/edit/post/{postId}/delete")
     public ResponseEntity<String> deletePost(@PathVariable("postId") Long postId, @AuthenticationPrincipal UserDetails userDetails) {

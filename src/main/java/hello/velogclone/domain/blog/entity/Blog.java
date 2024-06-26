@@ -1,7 +1,6 @@
 package hello.velogclone.domain.blog.entity;
 
 import hello.velogclone.domain.Series.entity.Series;
-import hello.velogclone.domain.draftpost.entity.DraftPost;
 import hello.velogclone.domain.follow.entity.Follow;
 import hello.velogclone.domain.post.entity.Post;
 import hello.velogclone.domain.user.entity.User;
@@ -35,8 +34,6 @@ public class Blog {
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
-    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DraftPost> draftPosts;
 
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> follows;

@@ -21,6 +21,7 @@ public class PostResponseDto {
     private Long likes;
     List<String> tags;
     private String series;
+    private boolean temporal;
 
 
     public PostResponseDto(Post post) {
@@ -29,5 +30,6 @@ public class PostResponseDto {
         this.content = post.getContent();
         this.tags = post.getTags().stream().map(tag -> "#" + tag.getName()).collect(Collectors.toList());
         this.series = post.getSeries() != null ? post.getSeries().getSeriesName() : "";
+        this.temporal = post.isTemporal();
     }
 }

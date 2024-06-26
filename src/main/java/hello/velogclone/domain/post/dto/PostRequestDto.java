@@ -20,5 +20,5 @@ public class PostRequestDto {
     private User user;
     private List<String> tags;
     private Series series;
-
+    private boolean temporal;
 }

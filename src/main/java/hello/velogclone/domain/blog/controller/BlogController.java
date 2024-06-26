@@ -46,7 +46,7 @@ public class BlogController {
     @GetMapping("/{blogId}")
     public String getBlog(@PathVariable("blogId") Long blogId, Model model) {
         Blog blog = blogService.getBlogById(blogId);
-        List<PostResponseDto> posts = postService.findAllPostByBlogId(blogId);
+        List<PostResponseDto> posts = postService.findAllByBlogIdAndTemporal(blogId, false);
         model.addAttribute("blog", blog);
         model.addAttribute("posts", posts);
         model.addAttribute("followingCount", followService.getFollowingCount(blogId));

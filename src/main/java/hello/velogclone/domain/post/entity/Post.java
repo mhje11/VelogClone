@@ -46,6 +46,8 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private List<Comment> comments;
 
+    private boolean temporal;
+
     @ManyToMany
     @JoinTable(
             name = "post_tags",

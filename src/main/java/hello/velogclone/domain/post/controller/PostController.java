@@ -25,7 +25,6 @@ public class PostController {
     private final PostService postService;
     private final UserRepository userRepository;
     private final TagService tagService;
-    private final SeriesService seriesService;
 
 
     @GetMapping("/{postId}")

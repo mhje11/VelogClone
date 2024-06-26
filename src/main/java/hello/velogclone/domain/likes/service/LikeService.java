@@ -6,6 +6,7 @@ import hello.velogclone.domain.post.entity.Post;
 import hello.velogclone.domain.post.service.PostService;
 import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.domain.user.repository.UserRepository;
+import hello.velogclone.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,7 @@ public class LikeService {
     private final PostService postService;
 
     public void likePost(Long postId, String loginId) {
-        User user = userRepository.findByLoginId(loginId).get();
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
         Post post = postService.findPostEntityById(postId);
         Optional<Likes> existingLike = likeRepository.findByUserAndPost(user, post);
         if (existingLike.isPresent()) {

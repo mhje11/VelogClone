@@ -2,6 +2,7 @@ package hello.velogclone.domain.follow.controller;
 
 import hello.velogclone.domain.follow.dto.FollowDto;
 import hello.velogclone.domain.follow.service.FollowService;
+import hello.velogclone.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class FollowRestController {
     @PostMapping("/follow")
     public ResponseEntity<String> followBlog(@PathVariable("blogId") Long blogId, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            throw new UnauthorizedException("로그인 후 이용 가능합니다.");
         }
         followService.followBlog(blogId, userDetails.getUsername());
         return ResponseEntity.ok("블로그를 팔로우했습니다.");

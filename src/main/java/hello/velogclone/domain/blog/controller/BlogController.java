@@ -6,8 +6,10 @@ import hello.velogclone.domain.blog.service.BlogService;
 import hello.velogclone.domain.follow.service.FollowService;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.service.PostService;
+import hello.velogclone.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,9 +29,18 @@ public class BlogController {
     private final FollowService followService;
 
     @GetMapping("/create")
-    public String createBlogForm(Model model) {
-        model.addAttribute("blog", new BlogDto());
-        return "blog/createBlogForm";
+    public String createBlogForm(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            if (userDetails == null) {
+                throw new UnauthorizedException("로그인후 사용 가능한 기능입니다.");
+            }
+            model.addAttribute("blog", new BlogDto());
+            return "blog/createBlogForm";
+        } catch (UnauthorizedException e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/api/login";
+        }
+
     }
 
     @PostMapping("/create")
@@ -56,22 +67,40 @@ public class BlogController {
 
     @GetMapping("/my")
     public String getMyBlog(@AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
-        Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
-        if (blog.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "먼저 블로그를 생성하세요");
-            return "redirect:/";
+        try {
+            if (userDetails == null) {
+                throw new UnauthorizedException("로그인후 사용 가능한 기능입니다.");
+            }
+            Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
+            if (blog.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "먼저 블로그를 생성하세요");
+                return "redirect:/";
+            }
+            return "redirect:/api/blogs/" + blog.get().getId();
+        } catch (UnauthorizedException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/api/login";
         }
-        return "redirect:/api/blogs/" + blog.get().getId();
+
     }
 
     @GetMapping("/{blogId}/edit")
     public String editBlogForm(@PathVariable("blogId") Long blogId, @AuthenticationPrincipal UserDetails userDetails, Model model) {
-        Blog blog = blogService.getBlogById(blogId);
-        BlogDto blogDto = new BlogDto();
-        blogDto.setTitle(blog.getTitle());
-        model.addAttribute("blog", blogDto);
-        model.addAttribute("blogId", blogId);
-        return "blog/editBlogForm";
+        try {
+            Blog blog = blogService.getBlogById(blogId);
+            if (!blog.getUser().getLoginId().equals(userDetails.getUsername())) {
+                throw new UnauthorizedException("블로그를 수정할 권한이 없습니다.");
+            }
+            BlogDto blogDto = new BlogDto();
+            blogDto.setTitle(blog.getTitle());
+            model.addAttribute("blog", blogDto);
+            model.addAttribute("blogId", blogId);
+            return "blog/editBlogForm";
+        } catch (UnauthorizedException e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/api/blogs/" + blogId;
+        }
+
     }
 
     @PostMapping("/{blogId}/edit")

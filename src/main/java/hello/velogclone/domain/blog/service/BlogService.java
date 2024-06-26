@@ -5,6 +5,8 @@ import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.blog.repository.BlogRepository;
 import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.domain.user.repository.UserRepository;
+import hello.velogclone.global.exception.BlogNotFoundException;
+import hello.velogclone.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,22 +21,22 @@ public class BlogService {
     private final UserRepository userRepository;
 
     public Blog createBlog(BlogDto blogDto, String loginId) {
-        Optional<User> user = userRepository.findByLoginId(loginId);
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
         Blog blog = new Blog();
-        blog.setUser(user.get());
+        blog.setUser(user);
         blog.setTitle(blogDto.getTitle());
         return blogRepository.save(blog);
     }
 
     @Transactional(readOnly = true)
     public Optional<Blog> findBlogByUserLoginId(String loginId) {
-        Optional<User> user = userRepository.findByLoginId(loginId);
-        return blogRepository.findBlogByUser(user.get());
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
+        return blogRepository.findBlogByUser(user);
     }
 
     public void updateBlog(BlogDto blogDto, String loginId) {
         Optional<Blog> optionalBlog = findBlogByUserLoginId(loginId);
-        Blog blog = optionalBlog.get();
+        Blog blog = optionalBlog.orElseThrow(() -> new BlogNotFoundException("해당 블로그를 찾을 수 없습니다."));
         blog.setTitle(blogDto.getTitle());
         blogRepository.save(blog);
     }

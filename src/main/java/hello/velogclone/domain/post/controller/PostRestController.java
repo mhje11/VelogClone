@@ -18,12 +18,16 @@ public class PostRestController {
 
 
     @GetMapping("/api/blogs/{blogId}/edit/post")
-    public ResponseEntity<List<PostResponseDto>> findAllPost(@PathVariable("blogId") Long blogId) {
+    public ResponseEntity<List<PostResponseDto>> findAllPostNotTemporal(@PathVariable("blogId") Long blogId) {
         List<PostResponseDto> posts = postService.findAllPostByBlogId(blogId);
         return ResponseEntity.ok(posts);
     }
 
-
+    @GetMapping("/api/blogs/{blogId}/edit/temporalPost")
+    public ResponseEntity<List<PostResponseDto>> findAllPostTemporal(@PathVariable("blogId") Long blogId) {
+        List<PostResponseDto> posts = postService.findAllByBlogIdAndTemporal(blogId, true);
+        return ResponseEntity.ok(posts);
+    }
 
     @DeleteMapping("/api/blogs/{blogId}/edit/post/{postId}/delete")
     public ResponseEntity<String> deletePost(@PathVariable("postId") Long postId, @AuthenticationPrincipal UserDetails userDetails) {

@@ -10,6 +10,9 @@ import hello.velogclone.domain.post.repository.PostRepository;
 import hello.velogclone.domain.user.entity.Role;
 import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.domain.user.repository.UserRepository;
+import hello.velogclone.global.exception.CommentNotFoundException;
+import hello.velogclone.global.exception.PostNotFoundException;
+import hello.velogclone.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +29,8 @@ public class CommentService {
     private final UserRepository userRepository;
 
     public Comment createComment(CommentCreateDto commentCreateDto, String loginId, Long postId) {
-        User user = userRepository.findByLoginId(loginId).get();
-        Post post = postRepository.findById(postId).get();
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("해당 포스트를 찾을 수 없습니다."));
         Comment comment = new Comment();
         comment.setUser(user);
         comment.setPost(post);
@@ -37,19 +40,18 @@ public class CommentService {
     }
 
     public Comment updateComment(CommentUpdateDto commentUpdateDto, Long commentId) {
-        Comment comment = commentRepository.findById(commentId).get();
-        comment.setContent(commentUpdateDto.getContent());
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));        comment.setContent(commentUpdateDto.getContent());
         return commentRepository.save(comment);
     }
 
     public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).get();
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
         commentRepository.delete(comment);
     }
 
     public boolean Authorization(Long commentId, String loginId) {
-        Comment comment = commentRepository.findById(commentId).get();
-        User user = userRepository.findByLoginId(loginId).get();
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
         if(comment.getUser().getLoginId().equals(loginId) || user.getRole().equals(Role.ROLE_ADMIN)) {
             return true;
         }

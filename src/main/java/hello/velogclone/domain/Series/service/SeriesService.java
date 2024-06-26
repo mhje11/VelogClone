@@ -5,6 +5,8 @@ import hello.velogclone.domain.Series.entity.Series;
 import hello.velogclone.domain.Series.repository.SeriesRepository;
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.blog.repository.BlogRepository;
+import hello.velogclone.global.exception.BlogNotFoundException;
+import hello.velogclone.global.exception.SeriesNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,15 +30,15 @@ public class SeriesService {
     }
 
     public void createSeries(SeriesDto seriesDto, Long blogId) {
-        Series series = new Series();
-        Blog blog = blogRepository.findById(blogId).get();
-        series.setSeriesName(seriesDto.getSeriesName());
-        series.setBlog(blog);
-        seriesRepository.save(series);
+            Series series = new Series();
+            Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException("해당 블로그를 찾을 수 없습니다."));
+            series.setSeriesName(seriesDto.getSeriesName());
+            series.setBlog(blog);
+            seriesRepository.save(series);
     }
 
     public void deleteSeries(Long seriesId) {
-        Series series = seriesRepository.findById(seriesId).get();
+        Series series = seriesRepository.findById(seriesId).orElseThrow(() -> new SeriesNotFoundException("해당 시리즈를 찾을 수 없습니다."));
         seriesRepository.delete(series);
     }
 

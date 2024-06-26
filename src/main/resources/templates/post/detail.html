@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${post.title}">게시글 상세보기</title>
-    <!-- jQuery 포함 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
@@ -27,14 +26,10 @@
     <h2 th:text="${post.getSeries()}"></h2>
     <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
 
-    <!-- 댓글 목록 -->
     <div>
         <h2>댓글</h2>
-        <ul id="comments-list">
-            <!-- 댓글이 여기에 동적으로 추가됩니다. -->
-        </ul>
+        <ul id="comments-list"></ul>
     </div>
-    <!-- 댓글 작성 폼 -->
     <div>
         <h3>댓글 작성</h3>
         <form id="create-comment-form">
@@ -46,27 +41,15 @@
 
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
-        const blogId = /*[[${blogId}]]*/ 'defaultBlogId'; // Thymeleaf가 여기를 JavaScript로 변환
-        const postId = /*[[${post.id}]]*/ 'defaultPostId'; // Thymeleaf가 여기를 JavaScript로 변환
+        const blogId = /*[[${blogId}]]*/ 'defaultBlogId';
+        const postId = /*[[${post.id}]]*/ 'defaultPostId';
 
-
-        // 댓글 목록 로드
         function loadComments() {
             const commentsList = document.getElementById('comments-list');
 
-            console.log(blogId)
-            console.log(postId)
-
             if (commentsList) {
-                console.log('comments-list element found.');
-
                 fetch(`/api/blogs/${blogId}/${postId}/comments`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('댓글 목록 로드 중 오류 발생');
-                        }
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(comments => {
                         commentsList.innerHTML = '';
                         comments.forEach(comment => {
@@ -85,88 +68,68 @@
                             commentsList.appendChild(listItem);
                         });
                     })
-                    .catch(error => console.error(error.message));
-            } else {
-                console.error('comments-list element not found.');
+                    .catch(error => alert('댓글 목록 로드 중 오류 발생: ' + error.message));
             }
         }
 
-        // 댓글 작성
         document.getElementById('create-comment-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const content = document.getElementById('comment-content').value;
 
             fetch(`/api/blogs/${blogId}/${postId}/comments`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: content })
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('댓글 생성 중 오류 발생');
-                    }
-                    return response.text();
-                })
-                .then(() => {
+                .then(response => response.text())
+                .then(message => {
+                    alert(message);
                     document.getElementById('comment-content').value = '';
                     loadComments();
                 })
-                .catch(error => console.error(error.message));
+                .catch(error => alert('댓글 생성 중 오류 발생: ' + error.message));
         });
 
-        // 댓글 수정
-        document.getElementById('comments-list').addEventListener('click', function(event) {
-            if (event.target.classList.contains('edit-comment-btn')) {
-                const commentItem = event.target.closest('.comment-item');
-                const commentId = commentItem.dataset.commentId;
-                const newContent = prompt('새 댓글 내용을 입력하세요:', commentItem.querySelector('p').textContent.split(' : ')[1]);
+        const commentsListElement = document.getElementById('comments-list');
+        if (commentsListElement) {
+            commentsListElement.addEventListener('click', function(event) {
+                if (event.target.classList.contains('edit-comment-btn')) {
+                    const commentItem = event.target.closest('.comment-item');
+                    const commentId = commentItem.dataset.commentId;
+                    const newContent = prompt('새 댓글 내용을 입력하세요:', commentItem.querySelector('p').textContent.split(' : ')[1]);
 
-                if (newContent) {
-                    fetch(`/api/blogs/${blogId}/${postId}/comments/${commentId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ content: newContent })
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('댓글 수정 중 오류 발생');
-                            }
-                            return response.json();
+                    if (newContent) {
+                        fetch(`/api/blogs/${blogId}/${postId}/comments/${commentId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ content: newContent })
                         })
-                        .then(() => {
-                            loadComments();
+                            .then(response => response.text())
+                            .then(message => {
+                                alert(message);
+                                loadComments();
+                            })
+                            .catch(error => alert('댓글 수정 중 오류 발생: ' + error.message));
+                    }
+                } else if (event.target.classList.contains('delete-comment-btn')) {
+                    const commentItem = event.target.closest('.comment-item');
+                    const commentId = commentItem.dataset.commentId;
+
+                    if (confirm('댓글을 삭제하시겠습니까?')) {
+                        fetch(`/api/blogs/${blogId}/${postId}/comments/${commentId}`, {
+                            method: 'DELETE'
                         })
-                        .catch(error => console.error(error.message));
+                            .then(response => response.text())
+                            .then(message => {
+                                alert(message);
+                                loadComments();
+                            })
+                            .catch(error => alert('댓글 삭제 중 오류 발생: ' + error.message));
+                    }
                 }
-            }
-        });
+            });
+        }
 
-        // 댓글 삭제
-        document.getElementById('comments-list').addEventListener('click', function(event) {
-            if (event.target.classList.contains('delete-comment-btn')) {
-                const commentItem = event.target.closest('.comment-item');
-                const commentId = commentItem.dataset.commentId;
-
-                if (confirm('댓글을 삭제하시겠습니까?')) {
-                    fetch(`/api/blogs/${blogId}/${postId}/comments/${commentId}`, {
-                        method: 'DELETE'
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('댓글 삭제 중 오류 발생');
-                            }
-                            loadComments();
-                        })
-                        .catch(error => console.error(error.message));
-                }
-            }
-        });
-
-        // 페이지 로드 시 댓글 목록 로드
         loadComments();
     });
 </script>

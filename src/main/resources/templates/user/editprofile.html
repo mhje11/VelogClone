@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile Edit</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/user/profile-edit.css}">
+    <style>
+        .profile-image-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+<main>
+    <h1>프로필 수정</h1>
+    <form th:action="@{/api/profile/{loginId}(loginId=${userDto.loginId})}" method="post" th:object="${userDto}">
+
+        <div>
+            <label for="loginId">로그인 아이디:</label>
+            <input type="text" id="loginId" name="loginId" th:field="*{loginId}" required>
+        </div>
+        <div>
+            <label for="email">이메일:</label>
+            <input type="email" id="email" name="email" th:field="*{email}" required>
+        </div>
+        <div>
+            <label for="name">이름:</label>
+            <input type="text" id="name" name="name" th:field="*{name}" required>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle-label">
+                <span>이메일 수신 여부:</span>
+                <div class="toggle-button" th:classappend="${userDto.receiveEmail} ? 'on' : ''" onclick="toggle(this, 'receiveEmail')"></div>
+                <input type="checkbox" class="hidden-checkbox" id="receiveEmail" name="receiveEmail" th:field="*{receiveEmail}">
+            </div>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle-label">
+                <span>댓글 알람 여부:</span>
+                <div class="toggle-button" th:classappend="${userDto.commentNotification} ? 'on' : ''" onclick="toggle(this, 'commentNotification')"></div>
+                <input type="checkbox" class="hidden-checkbox" id="commentNotification" name="commentNotification" th:field="*{commentNotification}">
+            </div>
+        </div>
+        <div>
+            <button type="submit">수정</button>
+        </div>
+    </form>
+</main>
+
+<script>
+    function toggle(element, fieldName) {
+        element.classList.toggle('on');
+        const checkbox = document.getElementById(fieldName);
+        checkbox.checked = !checkbox.checked;
+    }
+
+</script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        /*<![CDATA[*/
+        const message = /*[[${message}]]*/ 'null';
+        if (message !== null) {
+            alert(message);
+        }
+        /*]]>*/
+    });
+</script>
+
+</body>
+</html>

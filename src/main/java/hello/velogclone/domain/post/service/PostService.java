@@ -88,6 +88,7 @@ public class PostService {
         existingPost.setContent(post.getContent());
         List<Tag> tags = tagService.findOrCreateTags(post.getTags().stream().map(Tag::getName).toList());
         existingPost.setTags(tags);
+        existingPost.setTemporal(post.isTemporal());
         postRepository.save(existingPost);
     }
 
@@ -112,9 +113,11 @@ public class PostService {
                 .filter(likes -> likeRepository.existsById(likes.getId()))
                 .count();
 
-        List<String> tags = post.getTags().stream()
+        String tags = post.getTags().stream()
                 .map(Tag::getName)
-                .collect(Collectors.toList());
+                .map(tag -> "#" + tag)
+                .collect(Collectors.joining(" "));
+
         String seriesName = post.getSeries() != null ? post.getSeries().getSeriesName() : "";
 
         return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags ,seriesName, post.isTemporal());

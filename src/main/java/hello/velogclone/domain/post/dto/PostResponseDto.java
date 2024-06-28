@@ -19,7 +19,7 @@ public class PostResponseDto {
     private String content;
     private Long blogId;
     private Long likes;
-    List<String> tags;
+    private String tags;
     private String series;
     private boolean temporal;
 
@@ -28,7 +28,7 @@ public class PostResponseDto {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
-        this.tags = post.getTags().stream().map(tag -> "#" + tag.getName()).collect(Collectors.toList());
+        this.tags = post.getTags().stream().map(tag -> "#" + tag.getName()).collect(Collectors.joining(" ")); // 변경된 부분
         this.series = post.getSeries() != null ? post.getSeries().getSeriesName() : "";
         this.temporal = post.isTemporal();
     }

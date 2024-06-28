@@ -1,4 +1,4 @@
-package hello.velogclone.global.security.handler;
+package hello.velogclone.global.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

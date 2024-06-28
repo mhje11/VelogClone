@@ -19,6 +19,6 @@ public class Follow {
     private Blog blog;
 
     @ManyToOne
-    @JoinColumn(name = "login_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

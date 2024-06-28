@@ -35,7 +35,7 @@ public class SecurityConfig {
                                 .logoutSuccessUrl("/") //로그아웃시 index.html로 이동하도록
                                 .permitAll() // 로그아웃은 모든 사용자에게 허용
                 )
-                .csrf().disable();
+                .csrf(csrf -> csrf.disable());
         return http.build();
     }
 

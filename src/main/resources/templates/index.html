@@ -13,6 +13,7 @@
             <a th:href="@{/api/logout}">로그아웃</a>
             <a th:href="@{/api/blogs/create}">블로그 생성</a>
             <a th:href="@{/api/blogs/my}">내 블로그</a>
+            <a th:href="@{/api/profile/{loginId}(loginId=${#authentication.name})}">프로필 편집</a>
             <div th:if="${blogExistError}">
                 <p th:text="${blogExistError}"></p>
             </div>
@@ -24,17 +25,17 @@
 </header>
 <main>
     <h1>환영합니다!</h1>
-    <div th:if="${error}">
-        <p th:text="${error}"></p>
-    </div>
-    <div th:unless="${error}">
-        <div th:if="${#authorization.expression('isAuthenticated()')}">
-            <p>내 블로그를 관리하거나 새로운 블로그를 생성할 수 있습니다.</p>
-        </div>
-        <div th:unless="${#authorization.expression('isAuthenticated()')}">
-            <p>블로그를 생성하려면 로그인하십시오.</p>
-        </div>
-    </div>
+
 </main>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        /*<![CDATA[*/
+        const error = /*[[${error}]]*/ 'null';
+        if (error !== null) {
+            alert(error);
+        }
+        /*]]>*/
+    });
+</script>
 </body>
 </html>

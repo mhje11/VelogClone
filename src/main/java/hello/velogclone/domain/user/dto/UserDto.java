@@ -1,6 +1,7 @@
 package hello.velogclone.domain.user.dto;
 
 import hello.velogclone.domain.user.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,20 +9,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserDto {
     private String loginId;
     private String password;
     private String email;
     private String name;
     private String role;
+    private Boolean receiveEmail;
+    private Boolean commentNotification;
+    private String profileImageUrl;
 
-    public UserDto(String loginId, String password, String email, String name, String role) {
-        this.loginId = loginId;
-        this.password = password;
-        this.email = email;
-        this.name = name;
-        this.role = role;
-    }
+
     public static UserDto of(User user) {
         UserDto userDto = new UserDto();
         userDto.setPassword(user.getPassword());
@@ -29,6 +28,9 @@ public class UserDto {
         userDto.setName(user.getName());
         userDto.setEmail(user.getEmail());
         userDto.setRole(user.getRole().getDescription());
+        userDto.setReceiveEmail(user.getReceiveEmail());
+        userDto.setCommentNotification(user.getCommentNotification());
+
         return userDto;
     }
 }

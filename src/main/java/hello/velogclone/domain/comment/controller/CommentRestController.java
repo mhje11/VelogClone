@@ -22,7 +22,7 @@ public class CommentRestController {
     private final CommentService commentService;
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<Comment> updateComment(@PathVariable("commentId") Long commentId,
+    public ResponseEntity<String> updateComment(@PathVariable("commentId") Long commentId,
                                            @RequestBody CommentUpdateDto commentUpdateDto,
                                            @AuthenticationPrincipal UserDetails userDetails) {
             if (userDetails == null) {
@@ -32,7 +32,7 @@ public class CommentRestController {
                 throw new UnauthorizedException("댓글을 수정할 권한이 없습니다.");
             }
             Comment comment = commentService.updateComment(commentUpdateDto, commentId);
-            return ResponseEntity.ok(comment);
+            return ResponseEntity.ok("댓글 수정 완료");
         }
 
 

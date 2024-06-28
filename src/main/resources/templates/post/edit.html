@@ -13,8 +13,10 @@
         <label for="content">내용:</label>
         <textarea id="content" name="content" required th:text="${post.content}"></textarea><br><br>
         <label for="tags">태그:</label>
-        <input type="text" id="tags" name="tags" class="tag-input" placeholder="#태그1 #태그2" th:value="${post.tags}"><br><br>
-        <button type="submit">수정</button>
+        <input type="text" id="tags" name="tags" class="tag-input" placeholder="#태그1 #태그2" th:value="${post.tags}" required><br><br>
+        <button type="button" id="update-button">수정</button>
+        <button type="button" id="temporal-button">임시 저장</button>
+        <button type="button" id="publish-button">출간</button>
     </form>
     <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
 </main>
@@ -34,10 +36,9 @@
         const mainElement = document.querySelector('main');
         const blogId = /*[[${blogId}]]*/ 'defaultBlogId'; // Thymeleaf가 여기를 JavaScript로 변환
         const postId = /*[[${post.id}]]*/ 'defaultPostId'; // Thymeleaf가 여기를 JavaScript로 변환
-        console.log(blogId);
-        console.log(postId);/*[[${blogId}]]*/
+        const originalTemporal = /*[[${post.temporal}]]*/ false; // 원래 temporal 값
 
-        document.getElementById('update-post-form').addEventListener('submit', function(event) {
+        document.getElementById('update-button').addEventListener('click', function(event) {
             event.preventDefault();
             const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
@@ -52,7 +53,8 @@
                 body: JSON.stringify({
                     title: title,
                     content: content,
-                    tags: tags.split(/\s+/).filter(tag => tag) // 태그를 공백으로 분리하여 배열로 보냄
+                    tags: tags.split(/\s+/).filter(tag => tag), // 태그를 공백으로 분리하여 배열로 보냄
+                    temporal: originalTemporal // 원래 temporal 값 그대로 사용
                 })
             })
                 .then(response => {
@@ -63,6 +65,68 @@
                 })
                 .then(data => {
                     alert('수정 완료');
+                    window.location.href = `/api/blogs/${blogId}`; // 목록 페이지로 리다이렉트
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('temporal-button').addEventListener('click', function() {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const tags = document.getElementById('tags').value;
+
+            // Fetch 요청을 사용하여 임시 저장 요청을 보냅니다.
+            fetch(`/api/blogs/${blogId}/posts/${postId}/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    content: content,
+                    tags: tags.split(/\s+/).filter(tag => tag), // 태그를 공백으로 분리하여 배열로 보냄
+                    temporal: true // 임시 저장이므로 temporal 값을 true로 설정
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('임시 저장 중 오류 발생');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('임시 저장 완료');
+                    window.location.href = `/api/blogs/${blogId}`; // 목록 페이지로 리다이렉트
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('publish-button').addEventListener('click', function() {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const tags = document.getElementById('tags').value;
+
+            // Fetch 요청을 사용하여 출간 요청을 보냅니다.
+            fetch(`/api/blogs/${blogId}/posts/${postId}/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    content: content,
+                    tags: tags.split(/\s+/).filter(tag => tag), // 태그를 공백으로 분리하여 배열로 보냄
+                    temporal: false // 출간이므로 temporal 값을 false로 설정
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('출간 중 오류 발생');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('출간 완료');
                     window.location.href = `/api/blogs/${blogId}`; // 목록 페이지로 리다이렉트
                 })
                 .catch(error => console.error('Error:', error));

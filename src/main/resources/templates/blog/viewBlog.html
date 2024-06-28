@@ -27,7 +27,7 @@
         <a th:href="@{/api/blogs/{blogId}/following(blogId=${blogId})}">팔로잉</a> (<span th:text="${followingCount}">0</span>)
         <a th:href="@{/api/blogs/{blogId}/follower(blogId=${blogId})}">팔로워</a> (<span th:text="${followerCount}">0</span>)
     </div>
-    <button th:if="${#authorization.expression('isAuthenticated()')}" th:onclick="followBlog([[${blog.id}]])">팔로우/언팔로우</button>
+    <button th:onclick="followBlog([[${blog.id}]])">팔로우/언팔로우</button>
     <h2>게시글 목록</h2>
     <ul>
         <li th:each="post : ${posts}">
@@ -63,8 +63,11 @@
                     alert('팔로우 상태가 변경되었습니다.');
                     window.location.reload();
                 } else {
-                    alert('팔로우에 실패했습니다.');
+                    return response.text().then(text => { throw new Error(text) });
                 }
+            })
+            .catch(error => {
+                alert(error.message);
             });
     }
 </script>

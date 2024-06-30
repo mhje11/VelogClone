@@ -1,5 +1,6 @@
 package hello.velogclone.domain.user.controller;
 
+import hello.velogclone.domain.profileimages.service.ProfileImageService;
 import hello.velogclone.domain.user.dto.UserDto;
 import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.domain.user.service.UserService;
@@ -26,6 +27,7 @@ import java.io.IOException;
 public class UserController {
     private final UserService userService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final ProfileImageService profileImageService;
 
     @GetMapping("/api/signup")
     public String toSignUp(Model model) {
@@ -71,8 +73,6 @@ public class UserController {
             return "redirect:/api/login";
         }
 
-            log.info("loginId : " + loginId);
-            log.info("userDetails loginId : " + userDetails.getUsername());
             if (!userDetails.getUsername().equals(loginId)) {
                 redirectAttributes.addFlashAttribute("error", "수정할 권한이 없습니다.");
                 return "redirect:/";
@@ -80,36 +80,67 @@ public class UserController {
             UserDto userDto = userService.findUserByLoginId(userDetails.getUsername());
             model.addAttribute("userDto", userDto);
             return "user/editprofile";
-
     }
 
     @PostMapping("/api/profile/{loginId}")
-    public String editProfile(@ModelAttribute UserDto userDto, RedirectAttributes redirectAttributes
-            , @AuthenticationPrincipal UserDetails userDetails, @PathVariable("loginId") String loginId) {
-        UserDto currentUser = userService.findUserByLoginId(userDetails.getUsername());
+    public String editProfile(@ModelAttribute UserDto userDto, RedirectAttributes redirectAttributes,
+                              @AuthenticationPrincipal UserDetails userDetails, @PathVariable("loginId") String loginId,
+                              @RequestParam("profileImage") MultipartFile profileImage) {
+        try {
+            UserDto currentUser = userService.findUserByLoginId(userDetails.getUsername());
+            User userWithEmail = userService.findUserByEmail(userDto.getEmail());
+            if (userWithEmail != null && !userWithEmail.getLoginId().equals(currentUser.getLoginId())) {
+                redirectAttributes.addFlashAttribute("message", "해당 이메일이 이미 존재합니다.");
+                return "redirect:/api/profile/" + loginId;
+            }
+            User userWithLoginId = userService.findUserByLoginIdOrElseNull(userDto.getLoginId());
+            if (userWithLoginId != null && !userWithLoginId.getLoginId().equals(currentUser.getLoginId())) {
+                redirectAttributes.addFlashAttribute("message", "해당 아이디가 이미 존재합니다.");
+                return "redirect:/api/profile/" + loginId;
+            }
 
-        User userWithEmail = userService.findUserByEmail(userDto.getEmail());
-        if (userWithEmail != null && !userWithEmail.getLoginId().equals(currentUser.getLoginId())) {
-            redirectAttributes.addFlashAttribute("message", "해당 이메일이 이미 존재합니다.");
+            userService.updateUser(userDto, loginId);
+
+            // SecurityContext 업데이트해주기
+            UserDetails updatedUserDetails = userDetailsService.loadUserByUsername(userDto.getLoginId());
+            Authentication authentication = new UsernamePasswordAuthenticationToken(updatedUserDetails, updatedUserDetails.getPassword(), updatedUserDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            if (!profileImage.isEmpty()) {
+                try {
+                    profileImageService.uploadProfileImage(userDto, profileImage);
+                } catch (IOException e) {
+                    log.info("파일 업로드 오류{}", e.getMessage());
+                    redirectAttributes.addFlashAttribute("error", "프로필 이미지 업로드 중 오류 발생");
+                    return "redirect:/api/profile/" + loginId;
+                }
+            }
+
+            redirectAttributes.addFlashAttribute("message", "수정이 성공적으로 됐습니다.");
+            return "redirect:/";
+        } catch (Exception e) {
+            log.error("프로필 수정 중 오류 발생", e);
+            redirectAttributes.addFlashAttribute("message", "프로필 수정 중 오류가 발생했습니다.");
             return "redirect:/api/profile/" + loginId;
         }
-        User userWithLoginId = userService.findUserByLoginIdOrElseNull(userDto.getLoginId());
-
-        if (userWithLoginId != null && !userWithLoginId.getLoginId().equals(currentUser.getLoginId())) {
-            redirectAttributes.addFlashAttribute("message", "해당 아이디가 이미 존재합니다.");
-            return "redirect:/api/profile/" + loginId;
-        }
-
-        userService.updateUser(userDto, loginId);
-
-        // SecurityContext 업데이트해주기
-        UserDetails updatedUserDetails = userDetailsService.loadUserByUsername(userDto.getLoginId());
-        Authentication authentication = new UsernamePasswordAuthenticationToken(updatedUserDetails, updatedUserDetails.getPassword(), updatedUserDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        redirectAttributes.addFlashAttribute("message", "수정이 성공적으로 됐습니다.");
-        return "redirect:/";
     }
 
-
+    @PostMapping("/api/profile/{loginId}/deleteProfileImage")
+    public String deleteProfileImage(@PathVariable("loginId") String loginId, RedirectAttributes redirectAttributes, @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            if (!userDetails.getUsername().equals(loginId)) {
+                redirectAttributes.addFlashAttribute("error", "이미지를 삭제할 권한이 없습니다.");
+                return "redirect:/api/profile/" + loginId;
+            }
+            userService.deleteProfileImage(loginId);
+            redirectAttributes.addFlashAttribute("message", "프로필 이미지가 삭제되었습니다.");
+            return "redirect:/api/profile/" + loginId;
+        } catch (Exception e) {
+            log.error("프로필 이미지 삭제 중 오류 발생", e);
+            redirectAttributes.addFlashAttribute("error", "프로필 이미지 삭제 중 오류가 발생했습니다.");
+            return "redirect:/api/profile/" + loginId;
+        }
+    }
 }
+
+

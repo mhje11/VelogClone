@@ -1,6 +1,7 @@
 package hello.velogclone.domain.user.service;
 
 import hello.velogclone.domain.profileimages.entity.ProfileImage;
+import hello.velogclone.domain.profileimages.service.ProfileImageService;
 import hello.velogclone.domain.user.dto.UserDto;
 import hello.velogclone.domain.user.entity.Role;
 import hello.velogclone.domain.user.entity.User;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProfileImageService profileImageService;
 
 
     public void signUp(UserDto userDto) {
@@ -57,28 +59,10 @@ public class UserService {
         user.setEmail(userDto.getEmail());
         user.setReceiveEmail(userDto.getReceiveEmail());
         user.setCommentNotification(userDto.getCommentNotification());
-
         userRepository.save(user);
     }
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
-    }
-
-    public void uploadProfileImage(String loginId, MultipartFile file) throws IOException {
-        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
-
-        String uuid = UUID.randomUUID().toString();
-        String fileName = user.getLoginId() + "_" + file.getOriginalFilename();
-        String profileImageDirectory = "src/main/resources/static/images/profiles";
-        String imagePathString = profileImageDirectory + File.separator + fileName;
-        Path imagePath = Paths.get(imagePathString);
-
-        Files.createDirectories(imagePath.getParent());
-        Files.write(imagePath, file.getBytes());
-
-        ProfileImage profileImage = new ProfileImage(file.getContentType(), "/images/profiles" + fileName, uuid, user);
-        user.setProfileImage(profileImage);
-        userRepository.save(user);
     }
 
 
@@ -91,5 +75,14 @@ public class UserService {
         user.setReceiveEmail(userDto.getReceiveEmail());
         user.setCommentNotification(userDto.getCommentNotification());
         return user;
+    }
+
+    public void uploadProfileImage(UserDto userDto, MultipartFile file) throws IOException {
+        profileImageService.uploadProfileImage(userDto, file);
+    }
+
+    public void deleteProfileImage(String loginId) {
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
+        profileImageService.deleteExistingProfileImage(UserDto.of(user));
     }
 }

@@ -17,8 +17,19 @@
 
 <main>
     <h1>프로필 수정</h1>
-    <form th:action="@{/api/profile/{loginId}(loginId=${userDto.loginId})}" method="post" th:object="${userDto}">
-
+    <form th:action="@{/api/profile/{loginId}(loginId=${userDto.loginId})}" method="post" th:object="${userDto}" enctype="multipart/form-data">
+        <div>
+            <label for="profileImage">프로필 이미지:</label>
+            <div>
+                <img th:if="${userDto.profileImageUrl != null}" th:src="@{${userDto.profileImageUrl}}"
+                     class="profile-image-preview"
+                     id="profileImagePreviewIf"/>
+                <img th:unless="${userDto.profileImageUrl != null}" th:src="@{/images/profiles/default-profile.png}"
+                     class="profile-image-preview"
+                     id="profileImagePreviewUnless"/>
+            </div>
+            <input type="file" id="profileImage" name="profileImage" accept="image/*" onchange="previewProfileImage(event)">
+        </div>
         <div>
             <label for="loginId">로그인 아이디:</label>
             <input type="text" id="loginId" name="loginId" th:field="*{loginId}" required>
@@ -49,6 +60,9 @@
             <button type="submit">수정</button>
         </div>
     </form>
+    <form th:action="@{/api/profile/{loginId}/deleteProfileImage(loginId=${userDto.loginId})}" method="post">
+        <button type="submit">프로필 이미지 삭제</button>
+    </form>
 </main>
 
 <script>
@@ -58,6 +72,20 @@
         checkbox.checked = !checkbox.checked;
     }
 
+    function previewProfileImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const ifOutput = document.getElementById('profileImagePreviewIf');
+            const unlessOutput = document.getElementById('profileImagePreviewUnless');
+            if (ifOutput) {
+                ifOutput.src = reader.result;
+            }
+            if (unlessOutput) {
+                unlessOutput.src = reader.result;
+            }
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
 </script>
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {

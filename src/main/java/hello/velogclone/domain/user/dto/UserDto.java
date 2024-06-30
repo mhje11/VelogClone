@@ -31,6 +31,12 @@ public class UserDto {
         userDto.setReceiveEmail(user.getReceiveEmail());
         userDto.setCommentNotification(user.getCommentNotification());
 
+        if (user.getProfileImage() != null) {
+            userDto.setProfileImageUrl(user.getProfileImage().getUrl());
+        } else {
+            userDto.setProfileImageUrl("/images/profiles/default-profile.png");
+        }
+
         return userDto;
     }
 }

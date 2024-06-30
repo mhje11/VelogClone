@@ -12,10 +12,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "profile_images")
 @NoArgsConstructor
-@Getter@Setter
+@Getter
+@Setter
 public class ProfileImage {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -24,17 +25,13 @@ public class ProfileImage {
     @Column(nullable = false)
     private String url;
 
-    @Column(nullable = false)
-    private String uuid;
-
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public ProfileImage(String type, String url, String uuid ,User user) {
+    public ProfileImage(String type, String url, User user) {
         this.type = type;
         this.url = url;
-        this.uuid = uuid;
         this.user = user;
     }
 }

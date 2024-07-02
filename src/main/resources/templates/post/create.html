@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>게시글 작성</title>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 </head>
 <body>
 
@@ -11,8 +12,7 @@
     <form id="post-form" th:action="@{/api/blogs/{blogId}/create(blogId=${blogId})}" method="post" th:object="${post}">
         <label for="title">제목:</label>
         <input type="text" id="title" name="title" required th:field="*{title}"><br><br>
-        <label for="content">내용:</label>
-        <textarea id="content" name="content" required th:field="*{content}"></textarea><br><br>
+        <div id="editor"></div><br><br>
         <label for="tags">태그:</label>
         <input type="text" id="tags" name="tags" class="tag-input" placeholder="#태그1 #태그2" th:field="*{tags}"><br><br>
         <label for="series">시리즈:</label>
@@ -25,45 +25,80 @@
     <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
 </main>
 
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
         const blogId = /*[[${blogId}]]*/ 'defaultBlogId';
+        const postForm = document.getElementById('post-form');
 
-        // 시리즈 목록을 불러오는 함수
+        // Toast UI Editor 초기화
+        const editor = new toastui.Editor({
+            el: document.querySelector('#editor'),
+            height: '500px',
+            initialEditType: 'markdown',
+            initialValue: '',
+            previewStyle: 'vertical',
+            hooks: {
+                addImageBlobHook: async (blob, callback) => {
+                    const formData = new FormData();
+                    formData.append('file', blob);
+                    formData.append('postId', /*[[${post.id}]]*/ 0);
+
+                    const response = await fetch('/api/blogs/' + blogId + '/uploadImage', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        callback(data.url, 'alt text');
+                    } else {
+                        const errorData = await response.json();
+                        alert('이미지 업로드 실패: ' + errorData.error);
+                    }
+                }
+            }
+        });
+
         function loadSeries() {
             fetch(`/api/blogs/${blogId}/edit/series`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('시리즈 목록 로드 중 오류 발생');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(series => {
                     const seriesSelect = document.getElementById('series');
                     seriesSelect.innerHTML = '<option value="">시리즈 선택</option>';
-                    series.forEach(series => {
+                    series.forEach(s => {
                         const option = document.createElement('option');
-                        option.value = series.id;
-                        option.textContent = series.seriesName;
+                        option.value = s.id;
+                        option.textContent = s.seriesName;
                         seriesSelect.appendChild(option);
                     });
                 })
                 .catch(error => console.error('Error:', error));
         }
 
-        // 임시저장 버튼 이벤트 리스너 추가
         document.getElementById('temporal-button').addEventListener('click', function() {
-            const postForm = document.getElementById('post-form');
             const temporalInput = document.createElement('input');
             temporalInput.type = 'hidden';
             temporalInput.name = 'temporal';
             temporalInput.value = 'true';
             postForm.appendChild(temporalInput);
+            const contentInput = document.createElement('input');
+            contentInput.type = 'hidden';
+            contentInput.name = 'content';
+            contentInput.value = editor.getMarkdown();
+            postForm.appendChild(contentInput);
             postForm.submit();
         });
 
-        // 페이지 로드 시 시리즈 목록 로드
         loadSeries();
+
+        document.getElementById('post-form').addEventListener('submit', function(event) {
+            const contentInput = document.createElement('input');
+            contentInput.type = 'hidden';
+            contentInput.name = 'content';
+            contentInput.value = editor.getMarkdown();
+            postForm.appendChild(contentInput);
+        });
     });
 </script>
 <script th:inline="javascript">
@@ -76,5 +111,6 @@
         /*]]>*/
     });
 </script>
+
 </body>
 </html>

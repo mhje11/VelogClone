@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostRequestDto {
+    private Long id;
     private String title;
     private String content;
     private Long blogId;

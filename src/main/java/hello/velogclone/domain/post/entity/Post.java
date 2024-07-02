@@ -4,7 +4,6 @@ import hello.velogclone.domain.Series.entity.Series;
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.comment.entity.Comment;
 import hello.velogclone.domain.likes.entity.Likes;
-import hello.velogclone.domain.postimage.entity.PostImage;
 import hello.velogclone.domain.tag.entity.Tag;
 import hello.velogclone.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -50,14 +49,12 @@ public class Post {
 
     private boolean temporal;
 
-    @Column(nullable = false, name = "created_at")
+    @Column(nullable = false, name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(nullable = false, name =  "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostImage> images;
 
     @ManyToMany
     @JoinTable(

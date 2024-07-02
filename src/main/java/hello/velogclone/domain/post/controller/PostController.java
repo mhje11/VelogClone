@@ -13,20 +13,32 @@ import hello.velogclone.global.exception.BlogNotFoundException;
 import hello.velogclone.global.exception.PostNotFoundException;
 import hello.velogclone.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.UUID;
+
 
 @Controller
 @RequestMapping("/api/blogs/{blogId}")
 @RequiredArgsConstructor
+@Slf4j
 public class PostController {
     private final PostService postService;
     private final UserRepository userRepository;
@@ -67,13 +79,49 @@ public class PostController {
     @PostMapping("/create")
     public String createPost(@PathVariable("blogId") Long blogId,
                              @ModelAttribute PostRequestDto postRequestDto,
-                             @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findByLoginId(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다."));
-        postRequestDto.setBlogId(blogId);
-        postService.createPost(postRequestDto, user);
-        return "redirect:/api/blogs/" + blogId;
+                             @AuthenticationPrincipal UserDetails userDetails,
+                             RedirectAttributes redirectAttributes) {
+        log.info("createPost called with blogId: {}, postRequestDto: {}", blogId, postRequestDto);
+        try {
+            User user = userRepository.findByLoginId(userDetails.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다."));
+            postRequestDto.setBlogId(blogId);
+            postService.createPost(postRequestDto, user);
+            return "redirect:/api/blogs/" + blogId;
+        } catch (Exception e) {
+            log.error("게시글 작성 중 오류 발생", e);
+            redirectAttributes.addFlashAttribute("error", "게시글 작성 중 오류가 발생했습니다.");
+            return "redirect:/api/blogs/" + blogId + "/create";
+        }
     }
+    @PostMapping("/uploadImage")
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+        try {
+            String uuid = UUID.randomUUID().toString();
+            String fileName = uuid + "_" + file.getOriginalFilename();
+            String baseDir = new File("src/main/resources/static/images/posts/").getAbsolutePath();
+            String imagePathString = baseDir + "/" + fileName;
+            Path imagePath = Paths.get(imagePathString);
+
+            if (!Files.exists(imagePath.getParent())) {
+                Files.createDirectories(imagePath.getParent());
+            }
+
+            file.transferTo(imagePath.toFile());
+            String imageUrl = "/images/posts/" + fileName;
+
+            Map<String, String> response = new HashMap<>();
+            response.put("url", imageUrl);
+
+            return ResponseEntity.ok(response);
+        } catch (IOException e) {
+            log.error("이미지 업로드 중 오류 발생", e);
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "이미지 업로드 중 오류 발생");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
 
     @GetMapping("/{postId}/update")
     public String editForm(@PathVariable("postId") Long postId,
@@ -127,4 +175,5 @@ public class PostController {
         }
         return blog;
     }
+
 }

@@ -13,6 +13,7 @@ import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.global.exception.PostNotFoundException;
 import hello.velogclone.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
     private final BlogRepository blogRepository;
@@ -76,6 +78,7 @@ public class PostService {
         post.setTags(tags);
         post.setSeries(postRequestDto.getSeries());
         postRepository.save(post);
+        log.info("게시글 생성 Id : {}", post.getId());
     }
 
     @Transactional
@@ -99,6 +102,7 @@ public class PostService {
             throw new UnauthorizedException("게시글을 삭제할 권한이 없습니다.");
         }
         postRepository.delete(post);
+        log.info("게시글 삭제 Id : {}", postId);
     }
     @Transactional(readOnly = true)
     public Post findPostEntityById(Long id) {

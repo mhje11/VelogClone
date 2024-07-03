@@ -123,11 +123,11 @@
                 .then(series => {
                     const seriesList = document.getElementById('series-list');
                     seriesList.innerHTML = '';
-                    series.forEach(serie => {
+                    series.forEach(series => {
                         const listItem = document.createElement('li');
-                        listItem.dataset.seriesId = serie.id;
+                        listItem.dataset.seriesId = series.id;
                         listItem.innerHTML = `
-                        <span>${serie.seriesName}</span>
+                        <span>${series.seriesName}</span>
                         <div class="series-actions">
                             <button type="button" class="delete-series-btn">삭제</button>
                         </div>

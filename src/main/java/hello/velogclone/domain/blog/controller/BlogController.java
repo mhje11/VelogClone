@@ -76,20 +76,21 @@ public class BlogController {
 
     @GetMapping("/{blogId}/edit")
     public String editBlogForm(@PathVariable("blogId") Long blogId, @AuthenticationPrincipal UserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
-        try {
             Blog blog = blogService.getBlogById(blogId);
+            if (userDetails == null) {
+                redirectAttributes.addFlashAttribute("error", "로그인 후 이용 가능 합니다.");
+                return "redirect:/api/login";
+            }
             if (!blog.getUser().getLoginId().equals(userDetails.getUsername())) {
-                throw new UnauthorizedException("블로그를 수정할 권한이 없습니다.");
+                redirectAttributes.addFlashAttribute("error", "블로그를 수정할 권한이 없습니다.");
+                return "redirect:/api/blogs/" + blogId;
             }
             BlogDto blogDto = new BlogDto();
             blogDto.setTitle(blog.getTitle());
             model.addAttribute("blog", blogDto);
             model.addAttribute("blogId", blogId);
             return "blog/editBlogForm";
-        } catch (UnauthorizedException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/api/blogs/" + blogId;
-        }
+
     }
 
     @PostMapping("/{blogId}/edit")

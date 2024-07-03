@@ -3,6 +3,7 @@ package hello.velogclone.domain.post.controller;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.entity.Post;
 import hello.velogclone.domain.post.service.PostService;
+import hello.velogclone.global.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostRestController {
     private final PostService postService;
+    private final CommonUtil commonUtil;
 
 
     @GetMapping("/api/blogs/{blogId}/edit/post")
@@ -38,6 +40,8 @@ public class PostRestController {
     public ResponseEntity<Post> updatePost(@PathVariable("postId") Long postId,
                                            @RequestBody Post post,
                                            @AuthenticationPrincipal UserDetails userDetails) {
+        String content = commonUtil.markdownToHtml(post.getContent());
+        post.setContent(content);
         postService.updatePost(postId, post, userDetails.getUsername());
         return ResponseEntity.ok(post);
     }

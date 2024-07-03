@@ -41,10 +41,16 @@ dependencies {
     implementation 'org.commonmark:commonmark-ext-gfm-tables:0.22.0'
     implementation 'org.commonmark:commonmark-ext-gfm-strikethrough:0.22.0'
     implementation 'org.commonmark:commonmark-ext-task-list-items:0.22.0'
+    implementation 'org.commonmark:commonmark-ext-autolink:0.22.0'
+    implementation 'org.commonmark:commonmark-ext-heading-anchor:0.22.0'
 
 
     //서버측에서 이미지 리사이즈하기
     implementation 'net.coobird:thumbnailator:0.4.14'
+
+    //html to markdown 하기 위해
+    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
+
 
 
 }

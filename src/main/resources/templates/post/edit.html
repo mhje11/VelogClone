@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="'게시글 수정 - ' + ${post.title}">게시글 수정</title>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 </head>
 <body>
 <main data-blog-id="[[${blogId}]]" data-post-id="[[${postId}]]">
@@ -10,8 +11,7 @@
     <form id="update-post-form">
         <label for="title">제목:</label>
         <input type="text" id="title" name="title" th:value="${post.title}" required><br><br>
-        <label for="content">내용:</label>
-        <textarea id="content" name="content" required th:text="${post.content}"></textarea><br><br>
+        <div id="editor"></div><br><br>
         <label for="tags">태그:</label>
         <input type="text" id="tags" name="tags" class="tag-input" placeholder="#태그1 #태그2" th:value="${post.tags}" required><br><br>
         <button type="button" id="update-button">수정</button>
@@ -21,27 +21,48 @@
     <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
 </main>
 
-<script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function() {
-        /*<![CDATA[*/
-        const error = /*[[${error}]]*/ 'null';
-        if (error !== null) {
-            alert(error);
-        }
-        /*]]>*/
-    });
-</script>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
         const mainElement = document.querySelector('main');
         const blogId = /*[[${blogId}]]*/ 'defaultBlogId'; // Thymeleaf가 여기를 JavaScript로 변환
-        const postId = /*[[${post.id}]]*/ 'defaultPostId'; // Thymeleaf가 여기를 JavaScript로 변환
+        const postId = /*[[${postId}]]*/ 'defaultPostId'; // Thymeleaf가 여기를 JavaScript로 변환
         const originalTemporal = /*[[${post.temporal}]]*/ false;
+
+        const initialContent = /*[[${post.content}]]*/ '';
+
+        // Toast UI Editor 초기화
+        const editor = new toastui.Editor({
+            el: document.querySelector('#editor'),
+            height: '500px',
+            initialEditType: 'markdown',
+            initialValue: initialContent,
+            previewStyle: 'vertical',
+            hooks: {
+                addImageBlobHook: async (blob, callback) => {
+                    const formData = new FormData();
+                    formData.append('file', blob);
+
+                    const response = await fetch('/api/blogs/' + blogId + '/uploadImage', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        callback(data.url, 'alt text');
+                    } else {
+                        const errorData = await response.json();
+                        alert('이미지 업로드 실패: ' + errorData.error);
+                    }
+                }
+            }
+        });
 
         document.getElementById('update-button').addEventListener('click', function(event) {
             event.preventDefault();
             const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
+            const content = editor.getMarkdown();
             const tags = document.getElementById('tags').value;
 
             // Fetch 요청을 사용하여 업데이트 요청을 보냅니다.
@@ -72,7 +93,7 @@
 
         document.getElementById('temporal-button').addEventListener('click', function() {
             const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
+            const content = editor.getMarkdown();
             const tags = document.getElementById('tags').value;
 
             fetch(`/api/blogs/${blogId}/posts/${postId}/update`, {
@@ -102,7 +123,7 @@
 
         document.getElementById('publish-button').addEventListener('click', function() {
             const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
+            const content = editor.getMarkdown();
             const tags = document.getElementById('tags').value;
 
             // Fetch 요청을 사용하여 출간 요청을 보냅니다.

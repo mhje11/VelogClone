@@ -16,6 +16,10 @@ import hello.velogclone.global.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+import org.commonmark.renderer.markdown.MarkdownRenderer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,7 +37,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 
 @Controller
@@ -89,7 +91,12 @@ public class PostController {
             User user = userRepository.findByLoginId(userDetails.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다."));
             postRequestDto.setBlogId(blogId);
-            String content = commonUtil.markdown(postRequestDto.getContent());
+
+            Parser parser = Parser.builder().build();
+            Node document = parser.parse(postRequestDto.getContent());
+            HtmlRenderer renderer = HtmlRenderer.builder().build();
+            String content = renderer.render(document);
+
             postRequestDto.setContent(content);
             postService.createPost(postRequestDto, user);
             return "redirect:/api/blogs/" + blogId;
@@ -139,11 +146,20 @@ public class PostController {
                            @AuthenticationPrincipal UserDetails userDetails
     , RedirectAttributes redirectAttributes) {
         try {
+            if (userDetails == null) {
+                redirectAttributes.addFlashAttribute("error", "로그인 후 이용 가능합니다.");
+                return "redirect:/api/login";
+            }
             Blog blog = checkBlogAndUser(blogId, userDetails);
             PostResponseDto post = postService.findPostById(postId);
             if (post == null) {
                 throw new PostNotFoundException("게시글을 찾을 수 없습니다.");
             }
+            String content = commonUtil.htmlToMarkdown(post.getContent());
+            post.setContent(content);
+            log.info(content);
+
+
             model.addAttribute("post", post);
             model.addAttribute("blogId", blogId);
             model.addAttribute("postId", postId);

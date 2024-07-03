@@ -123,8 +123,7 @@ public class PostController {
     @ResponseBody
     @PostMapping("/uploadImage")
     public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file,
-                                                           @AuthenticationPrincipal UserDetails userDetails,
-                                                           HttpSession session) {
+                                                           @AuthenticationPrincipal UserDetails userDetails, HttpSession session) {
         Map<String, String> response = new HashMap<>();
         try {
             User user = userRepository.findByLoginId(userDetails.getUsername())

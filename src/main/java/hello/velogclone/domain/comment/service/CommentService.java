@@ -40,7 +40,8 @@ public class CommentService {
     }
 
     public Comment updateComment(CommentUpdateDto commentUpdateDto, Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));        comment.setContent(commentUpdateDto.getContent());
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
+        comment.setContent(commentUpdateDto.getContent());
         return commentRepository.save(comment);
     }
 
@@ -52,7 +53,7 @@ public class CommentService {
     public boolean Authorization(Long commentId, String loginId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
         User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
-        if(comment.getUser().getLoginId().equals(loginId) || user.getRole().equals(Role.ROLE_ADMIN)) {
+        if (comment.getUser().getLoginId().equals(loginId) || user.getRole().equals(Role.ROLE_ADMIN)) {
             return true;
         }
         return false;
@@ -62,11 +63,17 @@ public class CommentService {
     public List<CommentResponseDto> findAllCommentByPostId(Long postId) {
         List<Comment> comments = commentRepository.findCommentByPostId(postId);
         return comments.stream()
-                .map(comment -> new CommentResponseDto(
-                        comment.getId(),
-                        comment.getUser().getLoginId(),
-                        comment.getContent()
-                ))
+                .map(comment -> {
+                    String profileImageUrl = comment.getUser().getProfileImage() != null ?
+                            comment.getUser().getProfileImage().getUrl() : "/images/profiles/default-profile.png";
+                    return new CommentResponseDto(
+                            comment.getId(),
+                            comment.getUser().getLoginId(),
+                            comment.getContent(),
+                            profileImageUrl
+                    );
+                })
                 .collect(Collectors.toList());
     }
+
 }

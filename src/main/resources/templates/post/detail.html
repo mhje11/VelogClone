@@ -28,7 +28,29 @@
             font-style: italic;
             color: #555;
         }
-
+        .comment-item {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .comment-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .comment-content {
+            display: flex;
+            align-items: center;
+        }
+        .comment-content p {
+            margin: 0;
+        }
+        .comment-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -73,7 +95,12 @@
 
             if (commentsList) {
                 fetch(`/api/blogs/${blogId}/${postId}/comments`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('댓글 목록 로드 실패');
+                        }
+                        return response.json();
+                    })
                     .then(comments => {
                         commentsList.innerHTML = '';
                         comments.forEach(comment => {
@@ -82,6 +109,7 @@
                             listItem.dataset.commentId = comment.id;
                             listItem.innerHTML = `
                                 <div class="comment-content">
+                                    <img src="${comment.profileImageUrl}" alt="Profile Image">
                                     <p>${comment.loginId} : ${comment.content}</p>
                                     <div class="comment-actions">
                                         <button class="edit-comment-btn">수정</button>

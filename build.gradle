@@ -36,6 +36,16 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    //마크다운 Html로 바꾸기
+    implementation 'org.commonmark:commonmark:0.22.0'
+    implementation 'org.commonmark:commonmark-ext-gfm-tables:0.22.0'
+    implementation 'org.commonmark:commonmark-ext-gfm-strikethrough:0.22.0'
+    implementation 'org.commonmark:commonmark-ext-task-list-items:0.22.0'
+
+
+    //서버측에서 이미지 리사이즈하기
+    implementation 'net.coobird:thumbnailator:0.4.14'
+
 
 }
 

@@ -12,8 +12,10 @@ import hello.velogclone.domain.user.repository.UserRepository;
 import hello.velogclone.global.exception.BlogNotFoundException;
 import hello.velogclone.global.exception.PostNotFoundException;
 import hello.velogclone.global.exception.UnauthorizedException;
+import hello.velogclone.global.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,6 +46,7 @@ public class PostController {
     private final UserRepository userRepository;
     private final TagService tagService;
     private final BlogRepository blogRepository;
+    private final CommonUtil commonUtil;
 
     @GetMapping("/{postId}")
     public String viewPost(@PathVariable("blogId") Long blogId,
@@ -86,6 +89,8 @@ public class PostController {
             User user = userRepository.findByLoginId(userDetails.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다."));
             postRequestDto.setBlogId(blogId);
+            String content = commonUtil.markdown(postRequestDto.getContent());
+            postRequestDto.setContent(content);
             postService.createPost(postRequestDto, user);
             return "redirect:/api/blogs/" + blogId;
         } catch (Exception e) {
@@ -95,19 +100,23 @@ public class PostController {
         }
     }
     @PostMapping("/uploadImage")
-    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            String uuid = UUID.randomUUID().toString();
-            String fileName = uuid + "_" + file.getOriginalFilename();
-            String baseDir = new File("src/main/resources/static/images/posts/").getAbsolutePath();
-            String imagePathString = baseDir + "/" + fileName;
-            Path imagePath = Paths.get(imagePathString);
+            String fileName = userDetails.getUsername() + "_" + file.getOriginalFilename();
+            String baseDir = "src/main/resources/static/images/posts/";
+            Path imagePath = Paths.get(baseDir, fileName);
 
+            // 디렉토리가 존재하지 않으면 생성
             if (!Files.exists(imagePath.getParent())) {
                 Files.createDirectories(imagePath.getParent());
             }
+            Files.write(imagePath, file.getBytes());
 
-            file.transferTo(imagePath.toFile());
+            //이미지 크기 임의로 조정
+            Thumbnails.of(imagePath.toFile())
+                    .size(300, 300)
+                    .toFile(imagePath.toFile());
+
             String imageUrl = "/images/posts/" + fileName;
 
             Map<String, String> response = new HashMap<>();

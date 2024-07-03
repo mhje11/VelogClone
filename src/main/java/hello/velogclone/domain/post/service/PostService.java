@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -92,6 +93,7 @@ public class PostService {
         List<Tag> tags = tagService.findOrCreateTags(post.getTags().stream().map(Tag::getName).toList());
         existingPost.setTags(tags);
         existingPost.setTemporal(post.isTemporal());
+        existingPost.setUpdatedAt(LocalDateTime.now());
         postRepository.save(existingPost);
     }
 
@@ -126,5 +128,6 @@ public class PostService {
 
         return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags ,seriesName, post.isTemporal());
     }
+
 
 }

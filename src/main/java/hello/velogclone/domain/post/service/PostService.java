@@ -64,7 +64,7 @@ public class PostService {
     }
 
     @Transactional
-    public void createPost(PostRequestDto postRequestDto, User user) {
+    public Post createPost(PostRequestDto postRequestDto, User user) {
         Blog blog = blogRepository.findById(user.getBlog().getId())
                 .orElseThrow(() -> new PostNotFoundException("블로그를 찾을 수 없습니다."));
         Post post = new Post();
@@ -82,6 +82,7 @@ public class PostService {
         post.setSeries(postRequestDto.getSeries());
         postRepository.save(post);
         log.info("게시글 생성 Id : {}", post.getId());
+        return post;
     }
 
     @Transactional
@@ -135,6 +136,26 @@ public class PostService {
         String normalized = Normalizer.normalize(fileName, Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("[^a-zA-Z0-9._-]");
         return pattern.matcher(normalized).replaceAll("");
+    }
+
+    @Transactional
+    public Post createTemporaryPost(PostRequestDto postRequestDto, User user) {
+        Post post = new Post();
+        post.setTitle(postRequestDto.getTitle());
+        post.setContent(""); // 임시로 빈 콘텐츠 설정
+        post.setUser(user);
+        post.setBlog(blogRepository.findById(postRequestDto.getBlogId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid blog ID")));
+        postRepository.save(post);
+        return post;
+    }
+
+    @Transactional
+    public void updatePostContent(Long postId, String content) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+        post.setContent(content);
+        postRepository.save(post);
     }
 
 }

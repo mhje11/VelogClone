@@ -1,11 +1,13 @@
 package hello.velogclone.domain.post.dto;
 
 import hello.velogclone.domain.Series.entity.Series;
+import hello.velogclone.domain.postimage.entity.PostImage;
 import hello.velogclone.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,4 +24,5 @@ public class PostRequestDto {
     private List<String> tags;
     private Series series;
     private boolean temporal;
+    private List<MultipartFile> postImages;
 }

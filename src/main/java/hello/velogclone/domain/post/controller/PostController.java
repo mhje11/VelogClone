@@ -4,7 +4,11 @@ import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.blog.repository.BlogRepository;
 import hello.velogclone.domain.post.dto.PostRequestDto;
 import hello.velogclone.domain.post.dto.PostResponseDto;
+import hello.velogclone.domain.post.entity.Post;
 import hello.velogclone.domain.post.service.PostService;
+import hello.velogclone.domain.postimage.entity.PostImage;
+import hello.velogclone.domain.postimage.repository.PostImageRepository;
+import hello.velogclone.domain.postimage.service.PostImageService;
 import hello.velogclone.domain.tag.entity.Tag;
 import hello.velogclone.domain.tag.service.TagService;
 import hello.velogclone.domain.user.entity.User;
@@ -12,9 +16,9 @@ import hello.velogclone.domain.user.repository.UserRepository;
 import hello.velogclone.global.exception.BlogNotFoundException;
 import hello.velogclone.global.exception.UnauthorizedException;
 import hello.velogclone.global.util.CommonUtil;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,12 +29,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Controller
@@ -43,6 +47,8 @@ public class PostController {
     private final TagService tagService;
     private final BlogRepository blogRepository;
     private final CommonUtil commonUtil;
+    private final PostImageService postImageService;
+
 
     @GetMapping("/{postId}")
     public String viewPost(@PathVariable("blogId") Long blogId,
@@ -79,6 +85,7 @@ public class PostController {
     public String createPost(@PathVariable("blogId") Long blogId,
                              @ModelAttribute PostRequestDto postRequestDto,
                              @AuthenticationPrincipal UserDetails userDetails,
+                             HttpSession session,
                              RedirectAttributes redirectAttributes) {
 
         try {
@@ -91,7 +98,20 @@ public class PostController {
             postRequestDto.setBlogId(blogId);
             String content = commonUtil.markdownToHtml(postRequestDto.getContent());
             postRequestDto.setContent(content);
-            postService.createPost(postRequestDto, user);
+            Post post = postService.createPost(postRequestDto, user);
+
+            // 세션에서 이미지 URL을 가져와서 PostImage로 저장
+            List<String> imageUrls = (List<String>) session.getAttribute("imageUrls");
+            if (imageUrls != null) {
+                for (String imageUrl : imageUrls) {
+                    PostImage postImage = new PostImage();
+                    postImage.setPost(post);
+                    postImage.setUrl(imageUrl);
+                    postImageService.save(postImage);
+                }
+                session.removeAttribute("imageUrls"); // 세션에서 이미지 URL 제거
+            }
+
             return "redirect:/api/blogs/" + blogId;
         } catch (Exception e) {
             log.error("게시글 작성 중 오류 발생", e);
@@ -99,34 +119,36 @@ public class PostController {
             return "redirect:/api/blogs/" + blogId + "/create";
         }
     }
+
+    @ResponseBody
     @PostMapping("/uploadImage")
-    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file,
+                                                           @AuthenticationPrincipal UserDetails userDetails,
+                                                           HttpSession session) {
+        Map<String, String> response = new HashMap<>();
         try {
-            String beforeFileName = userDetails.getUsername() + "_" + file.getOriginalFilename();
-            String fileName = postService.cleanFileName(beforeFileName);
-            String baseDir = "src/main/resources/static/images/posts/";
-            Path imagePath = Paths.get(baseDir, fileName);
+            User user = userRepository.findByLoginId(userDetails.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다."));
 
-            if (!Files.exists(imagePath.getParent())) {
-                Files.createDirectories(imagePath.getParent());
+            String imageUrl = postImageService.uploadImage(file, userDetails.getUsername());
+
+            // 세션에 이미지 URL 저장
+            List<String> imageUrls = (List<String>) session.getAttribute("imageUrls");
+            if (imageUrls == null) {
+                imageUrls = new ArrayList<>();
             }
-            Files.write(imagePath, file.getBytes());
+            imageUrls.add(imageUrl);
+            session.setAttribute("imageUrls", imageUrls);
 
-            //이미지 크기 임의로 조정
-            Thumbnails.of(imagePath.toFile())
-                    .size(300, 300)
-                    .toFile(imagePath.toFile());
-
-            String imageUrl = "/images/posts/" + fileName;
-
-            Map<String, String> response = new HashMap<>();
             response.put("url", imageUrl);
-
             return ResponseEntity.ok(response);
         } catch (IOException e) {
             log.error("이미지 업로드 중 오류 발생", e);
-            Map<String, String> response = new HashMap<>();
-            response.put("error", "이미지 업로드 중 오류 발생");
+            response.put("error", "이미지 업로드 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        } catch (Exception e) {
+            log.error("기타 오류 발생", e);
+            response.put("error", "기타 오류 발생: " + e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
     }
@@ -184,6 +206,7 @@ public class PostController {
             redirectAttributes.addFlashAttribute("error", "삭제할 권한이 없습니다.");
             return "redirect:/api/blogs/" + blogId;
         }
+        postImageService.deleteImagesByPostId(postId);
         postService.deletePost(postId, userDetails.getUsername());
         redirectAttributes.addFlashAttribute("error", "게시글 삭제 완료");
         return "redirect:/api/blogs/" + blogId;
@@ -200,4 +223,15 @@ public class PostController {
         return blog;
     }
 
+    private List<String> extractImageUrls(String content) {
+        List<String> imageUrls = new ArrayList<>();
+        String regex = "!\\[.*?\\]\\((/images/posts/.*?)\\)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+
+        while (matcher.find()) {
+            imageUrls.add(matcher.group(1));
+        }
+        return imageUrls;
+    }
 }

@@ -4,6 +4,7 @@ import hello.velogclone.domain.Series.entity.Series;
 import hello.velogclone.domain.blog.entity.Blog;
 import hello.velogclone.domain.comment.entity.Comment;
 import hello.velogclone.domain.likes.entity.Likes;
+import hello.velogclone.domain.postimage.entity.PostImage;
 import hello.velogclone.domain.tag.entity.Tag;
 import hello.velogclone.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -54,6 +55,9 @@ public class Post {
 
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImage> postImages;
 
 
     @ManyToMany

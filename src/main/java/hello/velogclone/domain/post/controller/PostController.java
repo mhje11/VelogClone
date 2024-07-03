@@ -10,16 +10,11 @@ import hello.velogclone.domain.tag.service.TagService;
 import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.domain.user.repository.UserRepository;
 import hello.velogclone.global.exception.BlogNotFoundException;
-import hello.velogclone.global.exception.PostNotFoundException;
 import hello.velogclone.global.exception.UnauthorizedException;
 import hello.velogclone.global.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
-import org.commonmark.node.Node;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
-import org.commonmark.renderer.markdown.MarkdownRenderer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +24,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -86,17 +80,16 @@ public class PostController {
                              @ModelAttribute PostRequestDto postRequestDto,
                              @AuthenticationPrincipal UserDetails userDetails,
                              RedirectAttributes redirectAttributes) {
-        log.info("createPost called with blogId: {}, postRequestDto: {}", blogId, postRequestDto);
+
         try {
+            if (userDetails == null) {
+                redirectAttributes.addFlashAttribute("error", "로그인 후 이용 가능합니다.");
+                return "redirect:/api/login";
+            }
             User user = userRepository.findByLoginId(userDetails.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다."));
             postRequestDto.setBlogId(blogId);
-
-            Parser parser = Parser.builder().build();
-            Node document = parser.parse(postRequestDto.getContent());
-            HtmlRenderer renderer = HtmlRenderer.builder().build();
-            String content = renderer.render(document);
-
+            String content = commonUtil.markdownToHtml(postRequestDto.getContent());
             postRequestDto.setContent(content);
             postService.createPost(postRequestDto, user);
             return "redirect:/api/blogs/" + blogId;
@@ -109,11 +102,11 @@ public class PostController {
     @PostMapping("/uploadImage")
     public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            String fileName = userDetails.getUsername() + "_" + file.getOriginalFilename();
+            String beforeFileName = userDetails.getUsername() + "_" + file.getOriginalFilename();
+            String fileName = postService.cleanFileName(beforeFileName);
             String baseDir = "src/main/resources/static/images/posts/";
             Path imagePath = Paths.get(baseDir, fileName);
 
-            // 디렉토리가 존재하지 않으면 생성
             if (!Files.exists(imagePath.getParent())) {
                 Files.createDirectories(imagePath.getParent());
             }
@@ -145,32 +138,31 @@ public class PostController {
                            Model model,
                            @AuthenticationPrincipal UserDetails userDetails
     , RedirectAttributes redirectAttributes) {
-        try {
             if (userDetails == null) {
                 redirectAttributes.addFlashAttribute("error", "로그인 후 이용 가능합니다.");
                 return "redirect:/api/login";
             }
-            Blog blog = checkBlogAndUser(blogId, userDetails);
+            Blog blog = blogRepository.findById(blogId)
+                    .orElseThrow(() -> new BlogNotFoundException("해당 블로그를 찾을 수 없습니다."));
+
+            if (!blog.getUser().getLoginId().equals(userDetails.getUsername())) {
+                redirectAttributes.addFlashAttribute("error", "수정할 권한이 없습니다.");
+                return "redirect:/api/blogs/" + blogId;
+            }
+
             PostResponseDto post = postService.findPostById(postId);
+
             if (post == null) {
-                throw new PostNotFoundException("게시글을 찾을 수 없습니다.");
+                redirectAttributes.addFlashAttribute("error", "게시글을 찾을 수 없습니다.");
+                return "redirect:/api/blogs/" + blogId;
             }
             String content = commonUtil.htmlToMarkdown(post.getContent());
             post.setContent(content);
-            log.info(content);
-
 
             model.addAttribute("post", post);
             model.addAttribute("blogId", blogId);
             model.addAttribute("postId", postId);
             return "post/edit";
-        } catch (UnauthorizedException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/api/blogs/" + blogId;
-        } catch (BlogNotFoundException | PostNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/";
-        }
     }
 
     @PostMapping("/{postId}/delete")
@@ -179,17 +171,24 @@ public class PostController {
                              @AuthenticationPrincipal UserDetails userDetails,
                              Model model
     , RedirectAttributes redirectAttributes) {
-        try {
-            Blog blog = checkBlogAndUser(blogId, userDetails);
-            postService.deletePost(postId, userDetails.getUsername());
-            return "redirect:/api/blogs/" + blogId;
-        } catch (UnauthorizedException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/api/blogs/" + blogId;
-        } catch (BlogNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/";
+
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("error", "로그인후 이용 가능합니다.");
+            return "redirect:/api/login";
         }
+
+        Blog blog = blogRepository.findById(blogId)
+                .orElseThrow(() -> new BlogNotFoundException("해당 블로그를 찾을 수 없습니다."));
+
+        if (!blog.getUser().getLoginId().equals(userDetails.getUsername())) {
+            redirectAttributes.addFlashAttribute("error", "삭제할 권한이 없습니다.");
+            return "redirect:/api/blogs/" + blogId;
+        }
+        postService.deletePost(postId, userDetails.getUsername());
+        redirectAttributes.addFlashAttribute("error", "게시글 삭제 완료");
+        return "redirect:/api/blogs/" + blogId;
+
+
     }
 
     private Blog checkBlogAndUser(Long blogId, UserDetails userDetails) {

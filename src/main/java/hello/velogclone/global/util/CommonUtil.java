@@ -11,12 +11,10 @@ import org.springframework.stereotype.Component;
 public class CommonUtil {
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
-    private final MarkdownRenderer markdownRenderer;
 
     public CommonUtil() {
         parser = Parser.builder().build();
         htmlRenderer = HtmlRenderer.builder().build();
-        markdownRenderer = MarkdownRenderer.builder().build();
     }
 
     public String markdownToHtml(String markdown) {
@@ -25,7 +23,6 @@ public class CommonUtil {
     }
 
     public String htmlToMarkdown(String html) {
-        String markdown = FlexmarkHtmlConverter.builder().build().convert(html);
-        return markdown;
+        return FlexmarkHtmlConverter.builder().build().convert(html);
     }
 }

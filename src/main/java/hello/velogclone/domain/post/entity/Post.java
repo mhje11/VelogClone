@@ -41,7 +41,7 @@ public class Post {
     @JoinColumn(name = "series_id")
     private Series series;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade =  CascadeType.ALL, orphanRemoval = true)
     private List<Likes> likes;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

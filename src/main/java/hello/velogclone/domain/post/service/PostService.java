@@ -17,10 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,5 +131,10 @@ public class PostService {
         return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags ,seriesName, post.isTemporal());
     }
 
+    public String cleanFileName(String fileName) {
+        String normalized = Normalizer.normalize(fileName, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("[^a-zA-Z0-9._-]");
+        return pattern.matcher(normalized).replaceAll("");
+    }
 
 }

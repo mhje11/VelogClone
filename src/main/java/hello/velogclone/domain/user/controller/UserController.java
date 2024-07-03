@@ -4,7 +4,6 @@ import hello.velogclone.domain.profileimages.service.ProfileImageService;
 import hello.velogclone.domain.user.dto.UserDto;
 import hello.velogclone.domain.user.entity.User;
 import hello.velogclone.domain.user.service.UserService;
-import hello.velogclone.global.exception.UserNotFoundException;
 import hello.velogclone.global.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

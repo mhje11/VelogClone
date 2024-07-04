@@ -30,6 +30,17 @@ public class PostImageService {
         String baseDir = "src/main/resources/static/images/posts/";
         Path imagePath = Paths.get(baseDir, fileName);
 
+        // 파일 이름 중복 체크 및 새로운 파일 이름 생성
+        int count = 1;
+        String newFileName = fileName;
+        while (Files.exists(imagePath)) {
+            String nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+            String extension = fileName.substring(fileName.lastIndexOf('.'));
+            newFileName = nameWithoutExtension + "_" + count + extension;
+            imagePath = Paths.get(baseDir, newFileName);
+            count++;
+        }
+
         if (!Files.exists(imagePath.getParent())) {
             Files.createDirectories(imagePath.getParent());
         }
@@ -40,7 +51,7 @@ public class PostImageService {
                 .size(300, 300)
                 .toFile(imagePath.toFile());
 
-        return "/images/posts/" + fileName;
+        return "/images/posts/" + newFileName;
     }
 
     public void deleteImagesByPostId(Long postId) {

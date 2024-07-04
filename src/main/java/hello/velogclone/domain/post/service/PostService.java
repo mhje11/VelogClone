@@ -14,12 +14,15 @@ import hello.velogclone.global.exception.PostNotFoundException;
 import hello.velogclone.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -42,11 +45,9 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostResponseDto> findAllByBlogIdAndTemporal(Long blogId, boolean temporal) {
-        List<PostResponseDto> post = postRepository.findAllByBlogIdAndTemporal(blogId, temporal).stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-        return post;
+    public Page<PostResponseDto> findAllByBlogIdAndTemporal(Long blogId, boolean temporal, Pageable pageable) {
+        return postRepository.findAllByBlogIdAndTemporal(blogId, temporal, pageable)
+                .map(PostResponseDto::new);
     }
 
     @Transactional(readOnly = true)
@@ -118,18 +119,20 @@ public class PostService {
 
 
     private PostResponseDto convertToDto(Post post) {
-        Long likeCount = post.getLikes().stream()
-                .filter(likes -> likeRepository.existsById(likes.getId()))
-                .count();
+        Long likeCount = post.getLikes() == null ? 0L : (long) post.getLikes().size();
 
-        String tags = post.getTags().stream()
+        List<String> tags = Arrays.asList(post.getTags().stream()
                 .map(Tag::getName)
                 .map(tag -> "#" + tag)
-                .collect(Collectors.joining(" "));
+                .collect(Collectors.joining(" ")).split(" "));
 
         String seriesName = post.getSeries() != null ? post.getSeries().getSeriesName() : "";
 
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags ,seriesName, post.isTemporal());
+        String thumbnailUrl = post.getPostImages().isEmpty() ? "/images/posts/default_thumbnail.png" : post.getPostImages().getFirst().getUrl();
+
+        Long commentCount = post.getComments() == null ? 0L : (long) post.getComments().size();
+
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags ,seriesName, post.isTemporal(), thumbnailUrl, post.getCreatedAt(), commentCount);
     }
 
     public String cleanFileName(String fileName) {
@@ -138,24 +141,5 @@ public class PostService {
         return pattern.matcher(normalized).replaceAll("");
     }
 
-    @Transactional
-    public Post createTemporaryPost(PostRequestDto postRequestDto, User user) {
-        Post post = new Post();
-        post.setTitle(postRequestDto.getTitle());
-        post.setContent(""); // 임시로 빈 콘텐츠 설정
-        post.setUser(user);
-        post.setBlog(blogRepository.findById(postRequestDto.getBlogId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid blog ID")));
-        postRepository.save(post);
-        return post;
-    }
-
-    @Transactional
-    public void updatePostContent(Long postId, String content) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
-        post.setContent(content);
-        postRepository.save(post);
-    }
 
 }

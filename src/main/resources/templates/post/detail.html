@@ -58,9 +58,9 @@
     <h1 th:text="${post.title}">게시글 제목</h1>
     <div th:utext="${post.content}">게시글 내용</div>
     <span th:text="'좋아요 ' + ${post.likes} + '개'">좋아요 개수</span>
-    <div>
+    <div class="post-tags">
         <h2>태그</h2>
-        <p th:text="${post.tags}">#태그</p>
+        <span th:each="tag : ${post.tags}" th:text="${tag} + ' '"></span>
     </div>
     <a th:href="@{/api/blogs/{blogId}/{postId}/update(blogId=${blogId}, postId=${post.id})}">수정</a>
     <form th:action="@{/api/blogs/{blogId}/{postId}/delete(blogId=${blogId}, postId=${post.id})}" method="post" style="display:inline;">

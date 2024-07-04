@@ -222,15 +222,4 @@ public class PostController {
         return blog;
     }
 
-    private List<String> extractImageUrls(String content) {
-        List<String> imageUrls = new ArrayList<>();
-        String regex = "!\\[.*?\\]\\((/images/posts/.*?)\\)";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(content);
-
-        while (matcher.find()) {
-            imageUrls.add(matcher.group(1));
-        }
-        return imageUrls;
-    }
 }

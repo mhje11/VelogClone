@@ -8,6 +8,9 @@ import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.service.PostService;
 import hello.velogclone.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,15 +53,21 @@ public class BlogController {
     }
 
     @GetMapping("/{blogId}")
-    public String getBlog(@PathVariable("blogId") Long blogId, Model model) {
+    public String getBlog(@PathVariable("blogId") Long blogId,
+                          @RequestParam(value = "page", defaultValue = "0") int page,
+                          Model model) {
         Blog blog = blogService.getBlogById(blogId);
-        List<PostResponseDto> posts = postService.findAllByBlogIdAndTemporal(blogId, false);
+        int size = 4; // 페이지 당 게시글 수
+        Page<PostResponseDto> postPage = postService.findAllByBlogIdAndTemporal(blogId, false, PageRequest.of(page, size, Sort.by("createdAt").descending()));
         model.addAttribute("blog", blog);
-        model.addAttribute("posts", posts);
+        model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("currentPage", postPage.getNumber());
+        model.addAttribute("totalPages", postPage.getTotalPages());
         model.addAttribute("followingCount", followService.getFollowingCount(blogId));
         model.addAttribute("followerCount", followService.getFollowerCount(blogId));
         return "blog/viewBlog";
     }
+
 
     @GetMapping("/my")
     public String getMyBlog(@AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {

@@ -25,6 +25,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/blogs/{blogId}", "/api/blogs/{blogId}/follower/**", "api/blogs/{blogId}/following/**").permitAll()
                                 .requestMatchers("/api/blogs/{blogId}/{postId}").permitAll()
                                 .requestMatchers("/api/blogs/{blogId}/{postId}/comments").permitAll()
+                                .requestMatchers("/error404").permitAll()
+                                .requestMatchers(("/error/**")).permitAll()
                                 .requestMatchers("/home/posts").permitAll()
                                 .anyRequest().authenticated()
                 )
@@ -47,7 +49,9 @@ public class SecurityConfig {
                         exceptionHandling
                                 .accessDeniedHandler((request, response, accessDeniedException) -> {
                                     String errorMessage = URLEncoder.encode("로그인 후 이용 가능합니다.", StandardCharsets.UTF_8);
-                                    response.sendRedirect("/api/login?message=" + errorMessage);                                }))
+                                    response.sendRedirect("/api/login?message=" + errorMessage);
+                                }))
+
                 .csrf(csrf -> csrf.disable());
         return http.build();
     }

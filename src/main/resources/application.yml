@@ -1,7 +1,6 @@
 spring:
   application:
     name: velogClone
-
   datasource:
     url: jdbc:mysql://localhost/velog
     username: mhje11
@@ -11,3 +10,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+server:
+  error:
+    include-exception: true
+    include-stacktrace: never
+    whitelabel:
+      enabled: false
+    path: /error
+
+

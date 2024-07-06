@@ -67,6 +67,10 @@ public class PostController {
                              Model model, @AuthenticationPrincipal UserDetails userDetails
     , RedirectAttributes redirectAttributes) {
         try {
+            if (userDetails == null) {
+                redirectAttributes.addFlashAttribute("message", "로그인 후 이용 가능합니다.");
+                return "redirect:/api/login";
+            }
             Blog blog = checkBlogAndUser(blogId, userDetails);
             PostRequestDto post = new PostRequestDto();
             model.addAttribute("blogId", blogId);
@@ -160,7 +164,7 @@ public class PostController {
                            @AuthenticationPrincipal UserDetails userDetails
     , RedirectAttributes redirectAttributes) {
             if (userDetails == null) {
-                redirectAttributes.addFlashAttribute("error", "로그인 후 이용 가능합니다.");
+                redirectAttributes.addFlashAttribute("message", "로그인 후 이용 가능합니다.");
                 return "redirect:/api/login";
             }
             Blog blog = blogRepository.findById(blogId)

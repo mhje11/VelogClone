@@ -49,8 +49,14 @@ public class UserController {
 
 
     @GetMapping("/api/login")
-    public String toLogin(Model model) {
+    public String toLogin(Model model, @RequestParam(value = "error", required = false) String error, @RequestParam(value = "message", required = false) String message) {
         model.addAttribute("user", new User());
+        if (error != null) {
+            model.addAttribute("error", error);
+        }
+        if (message != null) {
+            model.addAttribute("message", message);
+        }
         return "user/loginForm";
     }
 

@@ -1,8 +1,63 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Platform Name</title>
+    <style>
+        .post-card {
+            border: 1px solid #ddd;
+            padding: 16px;
+            margin: 16px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .post-thumbnail {
+            width: 100%;
+            height: auto;
+            max-width: 300px;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .post-title {
+            font-size: 1.5em;
+            margin: 16px 0;
+        }
+        .post-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+        .post-tags span {
+            background-color: #eee;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .post-info {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            margin: 0 5px;
+            padding: 5px 10px;
+            text-decoration: none;
+            color: #333;
+        }
+        .pagination .current-page {
+            font-weight: bold;
+            color: purple;
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -24,17 +79,89 @@
     </nav>
 </header>
 <main>
-    <h1>환영합니다!</h1>
-
+    <div id="posts-container"></div>
+    <div class="pagination" id="pagination"></div>
 </main>
+
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
-        /*<![CDATA[*/
-        const error = /*[[${error}]]*/ 'null';
-        if (error !== null) {
-            alert(error);
+        const postsContainer = document.getElementById('posts-container');
+        const paginationContainer = document.getElementById('pagination');
+        let currentPage = 0;
+        const size = 5;
+
+        function fetchPosts(page) {
+            fetch(`/home/posts?page=${page}&size=${size}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderPosts(data.posts);
+                    renderPagination(data.currentPage, data.totalPages);
+                })
+                .catch(error => console.error('Error fetching posts:', error));
         }
-        /*]]>*/
+
+        function renderPosts(posts) {
+            postsContainer.innerHTML = '';
+            posts.forEach(post => {
+                const postCard = document.createElement('div');
+                postCard.className = 'post-card';
+                postCard.innerHTML = `
+                    <img src="${post.thumbnailUrl}" class="post-thumbnail" alt="썸네일 이미지">
+                    <a href="/api/blogs/${post.blogId}/${post.id}" class="post-title">${post.title}</a>
+                    <div class="post-tags">${post.tags.map(tag => `<span>${tag}</span>`).join(' ')}</div>
+                    <div class="post-info">
+                        <span>${new Date(post.createdAt).toLocaleDateString()}</span>
+                        <span>댓글 ${post.commentsCount}개</span>
+                        <span>좋아요 ${post.likes}개</span>
+                    </div>
+                `;
+                postsContainer.appendChild(postCard);
+            });
+        }
+
+        function renderPagination(currentPage, totalPages) {
+            paginationContainer.innerHTML = '';
+            if (totalPages > 1) {
+                if (currentPage > 0) {
+                    const prevLink = document.createElement('a');
+                    prevLink.href = '#';
+                    prevLink.textContent = '이전';
+                    prevLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        fetchPosts(currentPage - 1);
+                    });
+                    paginationContainer.appendChild(prevLink);
+                }
+
+                for (let page = 0; page < totalPages; page++) {
+                    const pageLink = document.createElement(page === currentPage ? 'span' : 'a');
+                    pageLink.textContent = page + 1;
+                    if (page !== currentPage) {
+                        pageLink.href = '#';
+                        pageLink.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            fetchPosts(page);
+                        });
+                    } else {
+                        pageLink.className = 'current-page';
+                    }
+                    paginationContainer.appendChild(pageLink);
+                }
+
+                if (currentPage < totalPages - 1) {
+                    const nextLink = document.createElement('a');
+                    nextLink.href = '#';
+                    nextLink.textContent = '다음';
+                    nextLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        fetchPosts(currentPage + 1);
+                    });
+                    paginationContainer.appendChild(nextLink);
+                }
+            }
+        }
+
+        fetchPosts(currentPage);
     });
 </script>
 </body>

@@ -31,12 +31,11 @@ public class PostRestController {
         return ResponseEntity.ok(posts);
     }
 
-    @GetMapping("/{blogId}")
-    public ResponseEntity<Map<String, Object>> getBlogPosts(@PathVariable("blogId") Long blogId,
-                                                            @RequestParam(value = "page", defaultValue = "0") int page,
-                                                            @RequestParam(value = "size", defaultValue = "4") int size) {
+    @GetMapping("/home/posts")
+    public ResponseEntity<Map<String, Object>> getAllPosts(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                           @RequestParam(value = "size", defaultValue = "5") int size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<PostResponseDto> postPage = postService.findAllByBlogIdAndTemporal(blogId, false, pageRequest);
+        Page<PostResponseDto> postPage = postService.findAll(pageRequest);
 
         Map<String, Object> response = new HashMap<>();
         response.put("posts", postPage.getContent());

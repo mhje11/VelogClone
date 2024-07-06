@@ -33,6 +33,7 @@ public class PostResponseDto {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
+        this.blogId = post.getBlog().getId();
         this.tags = Arrays.asList(post.getTags().stream().map(tag -> "#" + tag.getName()).collect(Collectors.joining(" ")).split(" "));
         this.series = post.getSeries() != null ? post.getSeries().getSeriesName() : "";
         this.temporal = post.isTemporal();

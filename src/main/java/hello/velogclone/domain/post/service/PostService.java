@@ -15,6 +15,7 @@ import hello.velogclone.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,6 +117,11 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
     }
 
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> findAll(PageRequest pageRequest) {
+        Page<Post> posts = postRepository.findAll(pageRequest);
+        return posts.map(PostResponseDto::new);
+    }
 
 
     private PostResponseDto convertToDto(Post post) {

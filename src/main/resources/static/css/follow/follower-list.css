@@ -68,6 +68,7 @@ h1 {
     height: 40px;
     border-radius: 50%;
     margin-right: 10px;
+    border: 2px solid #e0e0e0;
 }
 
 .follower-loginId {

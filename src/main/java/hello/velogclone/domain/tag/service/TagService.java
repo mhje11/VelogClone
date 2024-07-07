@@ -1,13 +1,10 @@
 package hello.velogclone.domain.tag.service;
 
-import hello.velogclone.domain.post.entity.Post;
-import hello.velogclone.domain.post.service.PostService;
 import hello.velogclone.domain.tag.entity.Tag;
 import hello.velogclone.domain.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

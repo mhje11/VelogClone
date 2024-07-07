@@ -33,7 +33,7 @@ public class PostRestController {
 
     @GetMapping("/home/posts")
     public ResponseEntity<Map<String, Object>> getAllPosts(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                           @RequestParam(value = "size", defaultValue = "5") int size) {
+                                                           @RequestParam(value = "size", defaultValue = "6") int size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<PostResponseDto> postPage = postService.findAll(pageRequest);
 

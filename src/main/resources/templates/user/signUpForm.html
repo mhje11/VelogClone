@@ -3,55 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Signup Form</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/user/profile-edit.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/user/signUpForm.css}">
 </head>
 <body>
-<h2>회원가입</h2>
-<form method="post" th:action="@{/api/signup}" th:object="${user}">
-    <div>
-        <label for="loginId">아이디:</label>
-        <input type="text" id="loginId" name="loginId" th:field="*{loginId}">
-    </div>
-    <div>
-        <label for="name">이름:</label>
-        <input type="text" id="name" name="name" th:field="*{name}">
-    </div>
-    <div>
-        <label for="email">이메일:</label>
-        <input type="email" id="email" name="email" th:field="*{email}">
-    </div>
-    <div>
-        <label for="password">암호:</label>
-        <input type="password" id="password" name="password" th:field="*{password}">
-    </div>
-    <div>
-        <label for="role">역할:</label>
-        <select id="role" name="role" th:field="*{role}">
-            <option value="ROLE_USER">사용자</option>
-            <option value="ROLE_ADMIN">관리자</option>
-        </select>
-    </div>
-    <div class="toggle-container">
-        <div class="toggle-label">
-            <span>이메일 수신 여부:</span>
+<div class="container">
+    <h2>회원가입</h2>
+    <form method="post" th:action="@{/api/signup}" th:object="${user}" class="signup-form">
+        <div class="form-group">
+            <label for="loginId">아이디:</label>
+            <input type="text" id="loginId" name="loginId" th:field="*{loginId}">
+        </div>
+        <div class="form-group">
+            <label for="name">이름:</label>
+            <input type="text" id="name" name="name" th:field="*{name}">
+        </div>
+        <div class="form-group">
+            <label for="email">이메일:</label>
+            <input type="email" id="email" name="email" th:field="*{email}">
+        </div>
+        <div class="form-group">
+            <label for="password">암호:</label>
+            <input type="password" id="password" name="password" th:field="*{password}">
+        </div>
+        <div class="form-group">
+            <label for="role">역할:</label>
+            <select id="role" name="role" th:field="*{role}">
+                <option value="ROLE_USER">사용자</option>
+                <option value="ROLE_ADMIN">관리자</option>
+            </select>
+        </div>
+        <div class="form-group toggle-container">
+            <label for="receiveEmail" class="toggle-label">이메일 수신 여부:</label>
             <div class="toggle-button" th:classappend="${user.receiveEmail} ? 'on' : ''" onclick="toggle(this, 'receiveEmail')"></div>
             <input type="checkbox" class="hidden-checkbox" id="receiveEmail" name="receiveEmail" th:field="*{receiveEmail}">
         </div>
-    </div>
-    <div class="toggle-container">
-        <div class="toggle-label">
-            <span>댓글 알람 여부:</span>
+        <div class="form-group toggle-container">
+            <label for="commentNotification" class="toggle-label">댓글 알람 여부:</label>
             <div class="toggle-button" th:classappend="${user.commentNotification} ? 'on' : ''" onclick="toggle(this, 'commentNotification')"></div>
             <input type="checkbox" class="hidden-checkbox" id="commentNotification" name="commentNotification" th:field="*{commentNotification}">
         </div>
-    </div>
-    <div th:if="${error}">
-        <p style="color: red;" th:text="${error}"></p>
-    </div>
-    <div>
-        <button type="submit">회원가입</button>
-    </div>
-</form>
+        <div th:if="${error}" class="error-message">
+            <p th:text="${error}"></p>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="submit-button">회원가입</button>
+        </div>
+    </form>
+</div>
 
 <script>
     function toggle(element, fieldName) {

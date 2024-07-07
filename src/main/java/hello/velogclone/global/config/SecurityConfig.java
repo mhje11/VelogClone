@@ -1,4 +1,4 @@
-package hello.velogclone.global.security;
+package hello.velogclone.global.config;
 
 import hello.velogclone.global.exception.UnauthorizedException;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +24,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/**", "/css/**", "/js/**", "/", "/images/**").permitAll() // 모든 사용자에게 허용하는 URL 설정
                                 .requestMatchers("/api/blogs/{blogId}", "/api/blogs/{blogId}/follower/**", "api/blogs/{blogId}/following/**").permitAll()
                                 .requestMatchers("/api/blogs/{blogId}/{postId}").permitAll()
+                                .requestMatchers("/api/signup").permitAll()
                                 .requestMatchers("/api/blogs/{blogId}/{postId}/comments").permitAll()
                                 .requestMatchers("/error404").permitAll()
                                 .requestMatchers(("/error/**")).permitAll()

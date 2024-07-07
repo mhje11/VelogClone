@@ -3,80 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Platform Name</title>
-    <style>
-        .post-card {
-            border: 1px solid #ddd;
-            padding: 16px;
-            margin: 16px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .post-thumbnail {
-            width: 100%;
-            height: auto;
-            max-width: 300px;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        .post-title {
-            font-size: 1.5em;
-            margin: 16px 0;
-        }
-        .post-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin: 8px 0;
-        }
-        .post-tags span {
-            background-color: #eee;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        .post-info {
-            display: flex;
-            gap: 16px;
-            font-size: 0.9em;
-            color: #555;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .pagination a {
-            margin: 0 5px;
-            padding: 5px 10px;
-            text-decoration: none;
-            color: #333;
-        }
-        .pagination .current-page {
-            font-weight: bold;
-            color: purple;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/home/home.css}">
 </head>
 <body>
 <header>
-    <nav>
-        <h2>플랫폼 이름</h2>
-        <div th:if="${#authorization.expression('isAuthenticated()')}">
-            <p th:text="'환영합니다, ' + ${#authentication.name}"></p>
-            <a th:href="@{/api/logout}">로그아웃</a>
-            <a th:href="@{/api/blogs/create}">블로그 생성</a>
-            <a th:href="@{/api/blogs/my}">내 블로그</a>
-            <a th:href="@{/api/profile/{loginId}(loginId=${#authentication.name})}">프로필 편집</a>
-            <div th:if="${blogExistError}">
-                <p th:text="${blogExistError}"></p>
-            </div>
-        </div>
-        <div th:unless="${#authorization.expression('isAuthenticated()')}">
-            <a th:href="@{/api/login}">로그인</a>
-        </div>
-    </nav>
+    <header th:replace="fragments/login :: navbar"></header>
 </header>
 <main>
     <div id="posts-container"></div>
@@ -88,7 +19,7 @@
         const postsContainer = document.getElementById('posts-container');
         const paginationContainer = document.getElementById('pagination');
         let currentPage = 0;
-        const size = 5;
+        const size = 6;
 
         function fetchPosts(page) {
             fetch(`/home/posts?page=${page}&size=${size}`)
@@ -106,15 +37,16 @@
                 const postCard = document.createElement('div');
                 postCard.className = 'post-card';
                 postCard.innerHTML = `
-                    <img src="${post.thumbnailUrl}" class="post-thumbnail" alt="썸네일 이미지">
-                    <a href="/api/blogs/${post.blogId}/${post.id}" class="post-title">${post.title}</a>
-                    <div class="post-tags">${post.tags.map(tag => `<span>${tag}</span>`).join(' ')}</div>
-                    <div class="post-info">
-                        <span>${new Date(post.createdAt).toLocaleDateString()}</span>
-                        <span>댓글 ${post.commentsCount}개</span>
-                        <span>좋아요 ${post.likes}개</span>
-                    </div>
-                `;
+            <img src="${post.thumbnailUrl}" class="post-thumbnail" alt="썸네일 이미지">
+            <div class="post-content">
+                <a href="/api/blogs/${post.blogId}/${post.id}" class="post-title">${post.title}</a>
+                <div class="post-tags">${post.tags.map(tag => `<span>${tag}</span>`).join('')}</div>
+                <div class="post-info">
+                    <span>${new Date(post.createdAt).toLocaleDateString()}</span>
+                    <span>댓글 ${post.commentsCount} · 좋아요 ${post.likes}</span>
+                </div>
+            </div>
+        `;
                 postsContainer.appendChild(postCard);
             });
         }
@@ -162,6 +94,16 @@
         }
 
         fetchPosts(currentPage);
+    });
+</script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        /*<![CDATA[*/
+        const error = /*[[${error}]]*/ 'null';
+        if (error !== null) {
+            alert(error);
+        }
+        /*]]>*/
     });
 </script>
 </body>

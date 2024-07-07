@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/fragment/login.css}">
+</head>
+<body>
+<header th:fragment="navbar">
+    <nav class="navbar">
+        <div>
+            <a href="/" id="logo">플랫폼 이름</a>
+        </div>
+        <div class="navbar-right">
+            <div th:if="${#authorization.expression('isAuthenticated()')}">
+                <span th:text="${#authentication.name}" class="welcome-message"></span>
+                <a th:href="@{/api/logout}" class="nav-link">로그아웃</a>
+                <a th:href="@{/api/blogs/create}" class="nav-link">블로그 생성</a>
+                <a th:href="@{/api/blogs/my}" class="nav-link">내 블로그</a>
+                <a th:href="@{/api/profile/{loginId}(loginId=${#authentication.name})}" class="nav-link">프로필 편집</a>
+            </div>
+            <div th:unless="${#authorization.expression('isAuthenticated()')}">
+                <a th:href="@{/api/login}" class="nav-link login-btn">로그인</a>
+            </div>
+        </div>
+    </nav>
+</header>
+</body>
+</html>

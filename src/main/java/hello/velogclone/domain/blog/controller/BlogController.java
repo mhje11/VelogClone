@@ -6,6 +6,8 @@ import hello.velogclone.domain.blog.service.BlogService;
 import hello.velogclone.domain.follow.service.FollowService;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.service.PostService;
+import hello.velogclone.domain.user.dto.UserDto;
+import hello.velogclone.domain.user.service.UserService;
 import hello.velogclone.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,6 +36,11 @@ public class BlogController {
         if (userDetails == null) {
             redirectAttributes.addFlashAttribute("error", "로그인 후 사용 가능한 기능입니다.");
             return "redirect:/api/login";
+        }
+        Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
+        if (blog.get() != null) {
+            redirectAttributes.addFlashAttribute("error", "이미 블로그가 존재합니다.");
+            return "redirect:/";
         }
         model.addAttribute("blog", new BlogDto());
         return "blog/createBlogForm";

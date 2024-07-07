@@ -38,7 +38,7 @@ public class UserController {
     public String signUp(@ModelAttribute UserDto userDto, RedirectAttributes redirectAttributes) {
         try {
             userService.signUp(userDto);
-            redirectAttributes.addFlashAttribute("message", "성공적으로 회원가입 됐습니다.");
+            redirectAttributes.addFlashAttribute("success", "성공적으로 회원가입 됐습니다.");
             return "redirect:/api/login";
         } catch (Exception e) {
             log.error("오류 : {}", e.getMessage());
@@ -74,7 +74,7 @@ public class UserController {
     @GetMapping("/api/profile/{loginId}")
     public String editProfileForm(@AuthenticationPrincipal UserDetails userDetails, Model model, @PathVariable("loginId") String loginId, RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
-            redirectAttributes.addFlashAttribute("error", "로그인 후 이용 가능합니다.");
+            redirectAttributes.addFlashAttribute("message", "로그인 후 이용 가능합니다.");
             return "redirect:/api/login";
         }
 

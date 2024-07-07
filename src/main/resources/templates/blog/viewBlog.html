@@ -3,101 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${blog.title}">Blog</title>
-    <style>
-        .post-card {
-            border: 1px solid #ddd;
-            padding: 16px;
-            margin: 16px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .post-thumbnail {
-            width: 100%;
-            height: auto;
-            max-width: 300px;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        .post-title {
-            font-size: 1.5em;
-            margin: 16px 0;
-        }
-        .post-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin: 8px 0;
-        }
-        .post-tags span {
-            background-color: #eee;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        .post-info {
-            display: flex;
-            gap: 16px;
-            font-size: 0.9em;
-            color: #555;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .pagination a {
-            margin: 0 5px;
-            padding: 5px 10px;
-            text-decoration: none;
-            color: #333;
-        }
-        .pagination .current-page {
-            font-weight: bold;
-            color: purple;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/blog/viewBlog.css}">
 </head>
 <body>
-<header>
-    <nav>
-        <h2 th:text="${blog.title}">블로그</h2>
-        <div th:if="${#authorization.expression('isAuthenticated()')}">
-            <p th:text="'환영합니다, ' + ${#authentication.name}"></p>
-            <a th:href="@{/api/logout}">로그아웃</a>
-        </div>
-        <div th:unless="${#authorization.expression('isAuthenticated()')}">
-            <a th:href="@{/api/login}">로그인</a>
-        </div>
-    </nav>
-</header>
+    <header th:replace="fragments/login :: navbar"></header>
 <main>
     <h1 th:text="${blog.title}">블로그 제목</h1>
-    <div>
+    <div class="action-buttons">
         <a th:href="@{/api/blogs/{blogId}/edit(blogId=${blogId})}">블로그 수정</a>
-    </div>
-    <h2>팔로잉 & 팔로워</h2>
-    <div>
-        <a th:href="@{/api/blogs/{blogId}/following(blogId=${blogId})}">팔로잉</a> (<span th:text="${followingCount}">0</span>)
-        <a th:href="@{/api/blogs/{blogId}/follower(blogId=${blogId})}">팔로워</a> (<span th:text="${followerCount}">0</span>)
-    </div>
-    <button th:onclick="followBlog([[${blog.id}]])">팔로우/언팔로우</button>
-    <div>
+        <a th:href="@{/api/blogs/{blogId}/following(blogId=${blogId})}">팔로잉 (<span th:text="${followingCount}">0</span>)</a>
+        <a th:href="@{/api/blogs/{blogId}/follower(blogId=${blogId})}">팔로워 (<span th:text="${followerCount}">0</span>)</a>
+        <button th:onclick="followBlog([[${blog.id}]])">팔로우/언팔로우</button>
         <a th:href="@{/}">메인 페이지</a>
+        <a th:href="@{/api/blogs/{blogId}/create(blogId=${blogId})}">새 게시글 작성</a>
     </div>
+
     <h2>게시글 목록</h2>
     <div id="posts-container">
         <div th:each="post : ${posts}" class="post-card">
             <img th:src="${post.thumbnailUrl}" class="post-thumbnail" alt="썸네일 이미지">
-            <a th:href="@{/api/blogs/{blogId}/{postId}(blogId=${blogId}, postId=${post.id})}" class="post-title" th:text="${post.title}">게시글 제목</a>
-            <div class="post-tags">
-                <span th:each="tag : ${post.tags}" th:text="${tag}"></span>
-            </div>
-            <div class="post-info">
-                <span th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd')}"></span>
-                <span th:text="'댓글 ' + ${post.commentsCount} + '개'"></span>
-                <span th:text="'좋아요 ' + ${post.likes} + '개'"></span>
+            <div class="post-content">
+                <a th:href="@{/api/blogs/{blogId}/{postId}(blogId=${blogId}, postId=${post.id})}" class="post-title" th:text="${post.title}">게시글 제목</a>
+                <div class="post-tags">
+                    <span th:each="tag : ${post.tags}" th:text="${tag}"></span>
+                </div>
+                <div class="post-info">
+                    <span th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd')}"></span>
+                    <span th:text="'댓글 ' + ${post.commentsCount} + ' · 좋아요 ' + ${post.likes}"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -110,11 +43,8 @@
         </span>
         <a th:href="@{/api/blogs/{blogId}(blogId=${blogId}, page=${currentPage + 1})}" th:if="${currentPage < totalPages - 1}">다음</a>
     </div>
-    <a th:href="@{/api/blogs/{blogId}/create(blogId=${blogId})}">새 게시글 작성</a>
-    <a href="/">블로그 메인</a>
 </main>
 
-<!-- Error Alert Script -->
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
         /*<![CDATA[*/

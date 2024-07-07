@@ -4,25 +4,36 @@
     <meta charset="UTF-8">
     <title>게시글 작성</title>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/post/post-create.css}">
 </head>
 <body>
 
-<main data-blog-id="[[${blogId}]]">
+<main class="main-container" data-blog-id="[[${blogId}]]">
     <h1>새 게시글 작성</h1>
-    <form id="post-form" th:action="@{/api/blogs/{blogId}/create(blogId=${blogId})}" method="post" th:object="${post}">
-        <label for="title">제목:</label>
-        <input type="text" id="title" name="title" required th:field="*{title}"><br><br>
-        <div id="editor"></div><br><br>
-        <label for="tags">태그:</label>
-        <input type="text" id="tags" name="tags" class="tag-input" placeholder="#태그1 #태그2" th:field="*{tags}"><br><br>
-        <label for="series">시리즈:</label>
-        <select id="series" name="series">
-            <!-- 시리즈 목록이 여기에 동적으로 추가됩니다. -->
-        </select><br><br>
-        <button type="submit" id="submit-button">작성</button>
-        <button type="button" id="temporal-button">임시저장</button>
+    <form id="post-form" th:action="@{/api/blogs/{blogId}/create(blogId=${blogId})}" method="post" th:object="${post}" class="form-container">
+        <div class="form-group">
+            <label for="title">제목:</label>
+            <input type="text" id="title" name="title" required th:field="*{title}" class="form-control">
+        </div>
+        <div class="form-group">
+            <div id="editor"></div>
+        </div>
+        <div class="form-group">
+            <label for="tags">태그:</label>
+            <input type="text" id="tags" name="tags" class="tag-input form-control" placeholder="#태그1 #태그2" th:field="*{tags}">
+        </div>
+        <div class="form-group">
+            <label for="series">시리즈:</label>
+            <select id="series" name="series" class="form-control">
+                <!-- 시리즈 목록이 여기에 동적으로 추가됩니다. -->
+            </select>
+        </div>
+        <div class="form-group button-group">
+            <button type="submit" id="submit-button" class="btn">작성</button>
+            <button type="button" id="temporal-button" class="btn">임시저장</button>
+        </div>
     </form>
-    <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
+    <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}" class="back-link">목록으로 돌아가기</a>
 </main>
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>

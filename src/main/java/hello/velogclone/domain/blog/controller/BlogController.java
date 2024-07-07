@@ -34,11 +34,11 @@ public class BlogController {
     @GetMapping("/create")
     public String createBlogForm(Model model, @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
-            redirectAttributes.addFlashAttribute("error", "로그인 후 사용 가능한 기능입니다.");
+            redirectAttributes.addFlashAttribute("message", "로그인 후 사용 가능한 기능입니다.");
             return "redirect:/api/login";
         }
         Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
-        if (blog.get() != null) {
+        if (blog.isPresent()) {
             redirectAttributes.addFlashAttribute("error", "이미 블로그가 존재합니다.");
             return "redirect:/";
         }
@@ -77,7 +77,7 @@ public class BlogController {
     @GetMapping("/my")
     public String getMyBlog(@AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
-            redirectAttributes.addFlashAttribute("error", "로그인 후 사용 가능한 기능입니다.");
+            redirectAttributes.addFlashAttribute("message", "로그인 후 사용 가능한 기능입니다.");
             return "redirect:/api/login";
         }
         Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
@@ -92,7 +92,7 @@ public class BlogController {
     public String editBlogForm(@PathVariable("blogId") Long blogId, @AuthenticationPrincipal UserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
             Blog blog = blogService.getBlogById(blogId);
             if (userDetails == null) {
-                redirectAttributes.addFlashAttribute("error", "로그인 후 이용 가능 합니다.");
+                redirectAttributes.addFlashAttribute("message", "로그인 후 이용 가능 합니다.");
                 return "redirect:/api/login";
             }
             if (!blog.getUser().getLoginId().equals(userDetails.getUsername())) {

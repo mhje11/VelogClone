@@ -96,6 +96,8 @@ public class PostService {
         existingPost.setTitle(post.getTitle());
         existingPost.setContent(post.getContent());
         List<Tag> tags = tagService.findOrCreateTags(post.getTags().stream().map(Tag::getName).toList());
+        log.info("시리즈 : " + post.getSeries());
+        existingPost.setSeries(post.getSeries());
         existingPost.setTags(tags);
         existingPost.setTemporal(post.isTemporal());
         existingPost.setUpdatedAt(LocalDateTime.now());

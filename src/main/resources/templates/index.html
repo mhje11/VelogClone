@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <title>Platform Name</title>
     <link rel="stylesheet" th:href="@{/css/home/home.css}">
+    <link rel="stylesheet" th:href="@{/css/fragment/login.css}">
+
 </head>
 <body>
-<header>
-    <header th:replace="fragments/login :: navbar"></header>
-</header>
 <main>
+    <header th:replace="fragments/login :: navbar"></header>
     <div id="posts-container"></div>
     <div class="pagination" id="pagination"></div>
 </main>

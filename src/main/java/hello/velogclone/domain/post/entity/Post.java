@@ -38,7 +38,7 @@ public class Post {
     @JoinColumn(name = "blog_id")
     private Blog blog;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "series_id")
     private Series series;
 

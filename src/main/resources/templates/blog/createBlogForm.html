@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Create Blog</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/blog/createBlog.css}">
 </head>
 <body>
-<main>
+<main class="main-container">
     <h1>새 블로그 만들기</h1>
-    <form method="post" th:action="@{/api/blogs/create}" th:object="${blog}">
-        <div>
+    <form method="post" th:action="@{/api/blogs/create}" th:object="${blog}" class="form-container">
+        <div class="form-group">
             <label for="title">블로그 제목:</label>
-            <input type="text" id="title" name="title" th:field="*{title}">
+            <input type="text" id="title" name="title" th:field="*{title}" class="form-control">
         </div>
-        <div>
-            <button type="submit">블로그 생성</button>
+        <div class="form-group">
+            <button type="submit" class="btn">블로그 생성</button>
         </div>
     </form>
 </main>

@@ -4,21 +4,36 @@
     <meta charset="UTF-8">
     <title th:text="'게시글 수정 - ' + ${post.title}">게시글 수정</title>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/post/post-create.css}">
 </head>
 <body>
-<main data-blog-id="[[${blogId}]]" data-post-id="[[${postId}]]">
+<main class="main-container" data-blog-id="[[${blogId}]]" data-post-id="[[${postId}]]">
     <h1 th:text="'게시글 수정 - ' + ${post.title}">게시글 수정</h1>
-    <form id="update-post-form">
-        <label for="title">제목:</label>
-        <input type="text" id="title" name="title" th:value="${post.title}" required><br><br>
-        <div id="editor"></div><br><br>
-        <label for="tags">태그:</label>
-        <input type="text" id="tags" name="tags" class="tag-input" placeholder="#태그1 #태그2" th:value="${post.getTagsAsString()}" required><br><br>
-        <button type="button" id="update-button">수정</button>
-        <button type="button" id="temporal-button">임시 저장</button>
-        <button type="button" id="publish-button">출간</button>
+    <form id="update-post-form" class="form-container">
+        <div class="form-group">
+            <label for="title">제목:</label>
+            <input type="text" id="title" name="title" th:value="${post.title}" required class="form-control">
+        </div>
+        <div class="form-group">
+            <div id="editor"></div>
+        </div>
+        <div class="form-group">
+            <label for="tags">태그:</label>
+            <input type="text" id="tags" name="tags" class="tag-input form-control" placeholder="#태그1 #태그2" th:value="${post.getTagsAsString()}" required>
+        </div>
+        <div class="form-group">
+            <label for="series">시리즈:</label>
+            <select id="series" name="series" class="form-control">
+                <!-- 시리즈 목록이 여기에 동적으로 추가됩니다. -->
+            </select>
+        </div>
+        <div class="form-group button-group">
+            <button type="button" id="update-button" class="btn">수정</button>
+            <button type="button" id="temporal-button" class="btn">임시 저장</button>
+            <button type="button" id="publish-button" class="btn">출간</button>
+        </div>
     </form>
-    <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">목록으로 돌아가기</a>
+    <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}" class="back-link">목록으로 돌아가기</a>
 </main>
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
@@ -58,11 +73,35 @@
             }
         });
 
+        function loadSeries() {
+            fetch(`/api/blogs/${blogId}/edit/series`)
+                .then(response => response.json())
+                .then(series => {
+                    const seriesSelect = document.getElementById('series');
+                    seriesSelect.innerHTML = '<option value="">시리즈 선택</option>';
+                    series.forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s.id;
+                        option.textContent = s.seriesName;
+                        seriesSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        loadSeries();
+
+        function getSelectedSeriesId() {
+            const seriesSelect = document.getElementById('series');
+            const selectedOption = seriesSelect.options[seriesSelect.selectedIndex];
+            return selectedOption.value ? { id: selectedOption.value } : null;
+        }
+
         document.getElementById('update-button').addEventListener('click', function(event) {
             event.preventDefault();
             const title = document.getElementById('title').value;
             const content = editor.getMarkdown();
             const tags = document.getElementById('tags').value;
+            const series = getSelectedSeriesId();
 
             // Fetch 요청을 사용하여 업데이트 요청을 보냅니다.
             fetch(`/api/blogs/${blogId}/posts/${postId}/update`, {
@@ -74,6 +113,7 @@
                     title: title,
                     content: content,
                     tags: tags.split(/\s+/).filter(tag => tag), // 태그를 공백으로 분리하여 배열로 보냄
+                    series: series, // 여기에 단일 객체로 전달
                     temporal: originalTemporal
                 })
             })
@@ -94,6 +134,7 @@
             const title = document.getElementById('title').value;
             const content = editor.getMarkdown();
             const tags = document.getElementById('tags').value;
+            const series = getSelectedSeriesId();
 
             fetch(`/api/blogs/${blogId}/posts/${postId}/update`, {
                 method: 'PUT',
@@ -104,6 +145,7 @@
                     title: title,
                     content: content,
                     tags: tags.split(/\s+/).filter(tag => tag), // 태그를 공백으로 분리하여 배열로 보냄
+                    series: series, // 여기에 단일 객체로 전달
                     temporal: true
                 })
             })
@@ -124,6 +166,7 @@
             const title = document.getElementById('title').value;
             const content = editor.getMarkdown();
             const tags = document.getElementById('tags').value;
+            const series = getSelectedSeriesId();
 
             // Fetch 요청을 사용하여 출간 요청을 보냅니다.
             fetch(`/api/blogs/${blogId}/posts/${postId}/update`, {
@@ -135,6 +178,7 @@
                     title: title,
                     content: content,
                     tags: tags.split(/\s+/).filter(tag => tag),
+                    series: series, // 여기에 단일 객체로 전달
                     temporal: false
                 })
             })

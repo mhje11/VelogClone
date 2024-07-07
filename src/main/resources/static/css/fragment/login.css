@@ -1,23 +1,25 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
+/* Header and Navigation Styling */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #ffffff;
-    padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem 2rem;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-#logo {
-    font-size: 24px;
+.navbar #logo {
+    font-size: 1.5rem;
     font-weight: bold;
     color: #20c997;
-    margin: 0;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.navbar #logo:hover {
+    background-color: rgba(32, 201, 151, 0.1);
 }
 
 .navbar-right {
@@ -25,29 +27,20 @@ body {
     align-items: center;
 }
 
-.nav-link {
-    color: #333;
+.navbar-right .nav-link {
+    margin-left: 1.5rem;
+    font-size: 1rem;
+    color: #495057;
     text-decoration: none;
-    padding: 8px 12px;
-    margin-left: 10px;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    transition: color 0.3s ease;
 }
 
-.nav-link:hover {
-    background-color: #f0f0f0;
-}
-
-.login-btn {
-    background-color: #007bff;
-    color: white;
-}
-
-.login-btn:hover {
-    background-color: #0056b3;
+.navbar-right .nav-link:hover {
+    color: #20c997;
 }
 
 .welcome-message {
-    margin-right: 15px;
-    color: #666;
+    margin-right: 1.5rem;
+    font-size: 1rem;
+    color: #495057;
 }

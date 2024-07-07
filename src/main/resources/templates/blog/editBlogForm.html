@@ -3,44 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>블로그 수정</title>
-    <style>
-        .post-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .series-actions {
-            display: flex;
-            gap: 10px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/blog/editBlog.css}">
 </head>
 <body>
 
-<main data-blog-id="[[${blogId}]]" data-series-id="[[${series.id}]]">
+<main data-blog-id="[[${blogId}]]" data-series-id="[[${series.id}]]" class="main-container">
     <h1>블로그 수정</h1>
-    <form th:action="@{/api/blogs/{blogId}/edit(blogId=${blogId})}" method="post">
-        <div>
-            <label for="title">블로그 제목:</label>
-            <input type="text" id="title" name="title" required th:value="${blog.title}">
-        </div>
-        <div>
-            <button type="submit">저장</button>
-        </div>
-    </form>
+
 
     <h2>게시글 목록</h2>
-    <ul id="posts-list">
+    <ul id="posts-list" class="posts-list">
         <!-- 게시글 목록이 여기에 동적으로 추가됩니다. -->
     </ul>
 
     <h2>시리즈 관리</h2>
-    <ul id="series-list">
+    <ul id="series-list" class="series-list">
         <!-- 시리즈 목록이 여기에 동적으로 추가됩니다. -->
     </ul>
-    <form id="create-series-form">
-        <label for="series-name">시리즈 이름:</label>
-        <input type="text" id="series-name" name="seriesName" required>
-        <button type="submit">시리즈 생성</button>
+    <form id="create-series-form" class="form-container">
+        <div class="form-group">
+            <label for="series-name">시리즈 이름:</label>
+            <input type="text" id="series-name" name="seriesName" required class="form-control">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn">시리즈 생성</button>
+        </div>
+    </form>
+
+    <form th:action="@{/api/blogs/{blogId}/edit(blogId=${blogId})}" method="post" class="form-container">
+        <div class="form-group">
+            <label for="title">블로그 제목:</label>
+            <input type="text" id="title" name="title" required th:value="${blog.title}" class="form-control">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn">저장</button>
+        </div>
     </form>
 </main>
 

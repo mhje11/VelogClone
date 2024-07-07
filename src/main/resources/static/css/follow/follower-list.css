@@ -1,0 +1,81 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.main-container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin: 100px auto 0; /* 헤더 아래로 간격 추가 */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    color: #343a40;
+    margin-bottom: 24px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.follower-list-container {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    justify-content: center;
+}
+
+.follower-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.follower-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: transparent; /* 경계와 배경색 제거 */
+    box-shadow: none; /* 그림자 제거 */
+}
+
+.follower-info {
+    display: flex;
+    align-items: center;
+}
+
+.follower-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.follower-loginId {
+    color: #20c997;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.follower-loginId:hover {
+    text-decoration: underline;
+}

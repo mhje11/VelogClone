@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,7 +45,11 @@ public class FollowService {
     public List<FollowDto> findAllFollowers(Long blogId) {
         Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException("해당 블로그를 찾을 수 없습니다."));
         return followRepository.findByBlog(blog).stream()
-                .map(follow -> new FollowDto(follow.getUser().getLoginId()))
+                .map(follow -> {
+                    String profileImageUrl = Objects.nonNull(follow.getUser().getProfileImage()) ?
+                            follow.getUser().getProfileImage().getUrl() : "/images/profiles/default-profile.png";
+                    return new FollowDto(follow.getUser().getLoginId(), profileImageUrl);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -52,7 +57,11 @@ public class FollowService {
     public List<FollowDto> findAllFollowingsByBlogId(Long blogId) {
         Blog blog = blogRepository.findById(blogId).get();
         return followRepository.findByUser(blog.getUser()).stream()
-                .map(follow -> new FollowDto(blog.getUser().getLoginId()))
+                .map(follow -> {
+                    String profileImageUrl = Objects.nonNull(follow.getUser().getProfileImage()) ?
+                            follow.getUser().getProfileImage().getUrl() : "/images/profiles/default-profile.png";
+                    return new FollowDto(blog.getUser().getLoginId(), profileImageUrl);
+                })
                 .collect(Collectors.toList());
     }
 

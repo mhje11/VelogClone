@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final BlogRepository blogRepository;
-    private final LikeRepository likeRepository;
     private final TagService tagService;
 
     @Transactional(readOnly = true)
@@ -113,6 +112,7 @@ public class PostService {
         postRepository.delete(post);
         log.info("게시글 삭제 Id : {}", postId);
     }
+
     @Transactional(readOnly = true)
     public Post findPostEntityById(Long id) {
         return postRepository.findById(id)
@@ -122,7 +122,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public Page<PostResponseDto> findAll(PageRequest pageRequest) {
         Page<Post> posts = postRepository.findAll(pageRequest);
-        return posts.map(PostResponseDto::new);
+        return posts.map(this::convertToDto);
     }
 
 
@@ -140,7 +140,12 @@ public class PostService {
 
         Long commentCount = post.getComments() == null ? 0L : (long) post.getComments().size();
 
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags ,seriesName, post.isTemporal(), thumbnailUrl, post.getCreatedAt(), commentCount);
+        String profileImageUrl = (post.getUser().getProfileImage() != null && post.getUser().getProfileImage().getUrl() != null) ? post.getUser().getProfileImage().getUrl()
+                : "/images/profiles/default-profile.png";
+
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags
+                , seriesName, post.isTemporal(), thumbnailUrl
+                , post.getCreatedAt(), commentCount, post.getUser().getLoginId(), profileImageUrl);
     }
 
     public String cleanFileName(String fileName) {

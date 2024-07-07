@@ -12,6 +12,10 @@
 <main data-blog-id="[[${blogId}]]" data-post-id="[[${post.id}]]">
 
     <div class="post-container">
+        <div class="post-author">
+            <img th:src="${post.profileImageUrl}" alt="Profile Image" class="profile-image">
+            <a th:href="@{/api/blogs/{blogId}(blogId=${post.blogId})}" th:text="${post.loginId}">작성자 로그인 아이디</a>
+        </div>
         <h1 class="post-title" th:text="${post.title}">게시글 제목</h1>
         <div class="post-content" th:utext="${post.content}">게시글 내용</div>
         <div class="post-likes">
@@ -71,7 +75,7 @@
                             listItem.dataset.commentId = comment.id;
                             listItem.innerHTML = `
                                 <div class="comment-content">
-                                    <img src="${comment.profileImageUrl}" alt="Profile Image">
+                                    <img src="${comment.profileImageUrl}" alt="Profile Image" class="comment-profile-image">
                                     <p>${comment.loginId} : ${comment.content}</p>
                                     <div class="comment-actions">
                                         <button class="btn edit-comment-btn">수정</button>
@@ -145,16 +149,6 @@
         }
 
         loadComments();
-    });
-</script>
-<script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function() {
-        /*<![CDATA[*/
-        const error = /*[[${error}]]*/ 'null';
-        if (error !== null) {
-            alert(error);
-        }
-        /*]]>*/
     });
 </script>
 </body>

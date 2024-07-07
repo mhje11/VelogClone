@@ -1,6 +1,7 @@
 package hello.velogclone.domain.post.dto;
 
 import hello.velogclone.domain.post.entity.Post;
+import hello.velogclone.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,8 @@ public class PostResponseDto {
     private String thumbnailUrl;
     private LocalDateTime createdAt;
     private Long commentsCount;
+    private String loginId;
+    private String profileImageUrl;
 
 
     public PostResponseDto(Post post) {
@@ -41,6 +44,9 @@ public class PostResponseDto {
         this.createdAt = post.getCreatedAt();
         this.commentsCount = post.getComments() == null ? 0L : (long) post.getComments().size();
         this.likes = post.getLikes() == null ? 0L : (long) post.getLikes().size();
+        this.loginId = post.getUser().getLoginId();
+        this.profileImageUrl =  post.getUser().getProfileImage().getUrl() != null ? post.getUser().getProfileImage().getUrl() : "images/profiles/default-profile.png";
+
     }
 
     public String getTagsAsString() {

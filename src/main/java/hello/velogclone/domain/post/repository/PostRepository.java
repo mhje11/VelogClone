@@ -13,5 +13,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByBlogId(Long blogId);
     Page<Post> findAllByBlogIdAndTemporal(Long blogId, boolean temporal, Pageable pageable);
 
+    Page<Post> findAllBySeriesId(Long SeriesId, Pageable pageable);
 
 }

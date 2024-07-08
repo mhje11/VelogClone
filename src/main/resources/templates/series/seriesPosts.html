@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>시리즈 포스트</title>
+    <link rel="stylesheet" th:href="@{/css/fragment/login.css}">
+    <link rel="stylesheet" th:href="@{/css/series/series-posts.css}">
+</head>
+<body>
+<header th:replace="fragments/login :: navbar"></header>
+<main>
+    <div class="content-section">
+        <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">최신글</a>
+        <a th:href="@{/api/blogs/{blogId}/series-list(blogId=${blogId})}">시리즈</a>
+    </div>
+    <h2> </h2>
+
+    <div id="posts-container" class="series-container">
+        <!-- 포스트 카드들이 여기 표시됩니다. -->
+    </div>
+
+    <div class="pagination" id="pagination">
+        <!-- 페이지네이션이 여기 표시됩니다. -->
+    </div>
+</main>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const blogId = /*[[${blogId}]]*/ 'defaultBlogId';
+        const seriesId = /*[[${seriesId}]]*/ 'defaultSeriesId';
+        const postsContainer = document.getElementById('posts-container');
+        const paginationContainer = document.getElementById('pagination');
+
+        function loadPosts(page = 0, size = 4) {
+            fetch(`/api/blogs/${blogId}/series/${seriesId}/postList?page=${page}&size=${size}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    renderPosts(data.content);
+                    renderPagination(data.number, data.totalPages);
+                })
+                .catch(error => console.error('Error fetching posts:', error));
+        }
+
+        function renderPosts(posts) {
+            postsContainer.innerHTML = '';
+            posts.forEach(post => {
+                const postCard = document.createElement('div');
+                postCard.className = 'post-card';
+                postCard.innerHTML = `
+                    <img src="${post.thumbnailUrl}" class="post-thumbnail" alt="썸네일 이미지">
+                    <div class="post-content">
+                        <a href="/api/blogs/${post.blogId}/${post.id}" class="post-title">${post.title}</a>
+                        <div class="post-tags">
+                            ${post.tags.map(tag => `<span>${tag}</span>`).join('')}
+                        </div>
+                        <div class="post-info">
+                            <span>${new Date(post.createdAt).toLocaleDateString()}</span>
+                            <span>댓글 ${post.commentsCount}  좋아요 ${post.likes}</span>
+                        </div>
+                    </div>
+                `;
+                postsContainer.appendChild(postCard);
+            });
+        }
+
+        function renderPagination(currentPage, totalPages) {
+            paginationContainer.innerHTML = '';
+            if (totalPages > 1) {
+                if (currentPage > 0) {
+                    const prevLink = document.createElement('a');
+                    prevLink.href = '#';
+                    prevLink.textContent = '이전';
+                    prevLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        loadPosts(currentPage - 1);
+                    });
+                    paginationContainer.appendChild(prevLink);
+                }
+
+                for (let page = 0; page < totalPages; page++) {
+                    const pageLink = document.createElement(page === currentPage ? 'span' : 'a');
+                    pageLink.textContent = page + 1;
+                    if (page !== currentPage) {
+                        pageLink.href = '#';
+                        pageLink.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            loadPosts(page);
+                        });
+                    } else {
+                        pageLink.className = 'current-page';
+                    }
+                    paginationContainer.appendChild(pageLink);
+                }
+
+                if (currentPage < totalPages - 1) {
+                    const nextLink = document.createElement('a');
+                    nextLink.href = '#';
+                    nextLink.textContent = '다음';
+                    nextLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        loadPosts(currentPage + 1);
+                    });
+                    paginationContainer.appendChild(nextLink);
+                }
+            }
+        }
+
+        loadPosts();
+    });
+</script>
+</body>
+</html>

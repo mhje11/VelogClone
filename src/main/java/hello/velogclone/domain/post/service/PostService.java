@@ -154,5 +154,10 @@ public class PostService {
         return pattern.matcher(normalized).replaceAll("");
     }
 
+    public Page<PostResponseDto> findAllBySeriesId(Long seriesId, Pageable pageable) {
+        Page<Post> posts = postRepository.findAllBySeriesId(seriesId, pageable);
+        return posts.map(this::convertToDto);
+    }
+
 
 }

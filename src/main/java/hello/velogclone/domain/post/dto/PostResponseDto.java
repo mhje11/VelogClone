@@ -45,7 +45,7 @@ public class PostResponseDto {
         this.commentsCount = post.getComments() == null ? 0L : (long) post.getComments().size();
         this.likes = post.getLikes() == null ? 0L : (long) post.getLikes().size();
         this.loginId = post.getUser().getLoginId();
-        this.profileImageUrl =  post.getUser().getProfileImage().getUrl() != null ? post.getUser().getProfileImage().getUrl() : "images/profiles/default-profile.png";
+        this.profileImageUrl =  (post.getUser().getProfileImage() != null && post.getUser().getProfileImage().getUrl() != null) ? post.getUser().getProfileImage().getUrl() : "images/profiles/default-profile.png";
 
     }
 

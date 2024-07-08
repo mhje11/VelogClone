@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
@@ -31,6 +32,14 @@ public class ProfileImageService {
 
     public void uploadProfileImage(UserDto userDto, MultipartFile file) throws IOException {
 
+//        if (userDto.getProfileImageUrl() != null) {
+//            Optional<ProfileImage> url = profileImageRepository.findByUrl(userDto.getProfileImageUrl());
+//            User user = userRepository.findByLoginId(userDto.getLoginId()).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
+//            profileImageRepository.delete(url.get());
+//            String imagePathString = "src/main/resources/static" + user.getProfileImage().getUrl();
+//            Path existingImagePath = Paths.get(imagePathString);
+//            Files.deleteIfExists(existingImagePath);
+//        }
         String cleanedFileName = cleanFileName(userDto.getLoginId() + "_" + file.getOriginalFilename());
         String imagePathString = "src/main/resources/static/images/profiles" + File.separator + cleanedFileName;
         Path imagePath = Paths.get(imagePathString);
@@ -80,9 +89,7 @@ public class ProfileImageService {
 
     // 파일 이름에 특수 문자 있을 시 처리
     private String cleanFileName(String fileName) {
-        // Normalize the filename to remove accents and special characters
         String normalized = Normalizer.normalize(fileName, Normalizer.Form.NFD);
-        // Remove all non-alphanumeric characters except underscores and hyphens
         Pattern pattern = Pattern.compile("[^a-zA-Z0-9._-]");
         return pattern.matcher(normalized).replaceAll("");
     }

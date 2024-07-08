@@ -14,7 +14,7 @@ body {
     padding: 40px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
+    width: 500px;
     max-width: 500px;
     text-align: center;
 }
@@ -129,4 +129,11 @@ input[type="file"] {
 .submit-button:hover,
 .delete-button:hover {
     background-color: #18a77a;
+}
+
+.profile-image-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
 }

@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <title>Profile Edit</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/user/profile-edit.css}">
-    <style>
-        .profile-image-preview {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-    </style>
 </head>
 <body>
 <main>
@@ -60,10 +52,40 @@
         <form th:action="@{/api/profile/{loginId}/deleteProfileImage(loginId=${userDto.loginId})}" method="post">
             <button type="submit" class="delete-button">프로필 이미지 삭제</button>
         </form>
+        <!-- 회원탈퇴 버튼 -->
+        <br>
+        <div>
+            <button class="delete-button" id="delete-user-button">회원탈퇴</button>
+        </div>
     </div>
 </main>
 
-<script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById('delete-user-button').addEventListener('click', function() {
+            const password = prompt("비밀번호를 입력하세요:");
+            if (password !== null) {
+                const loginId = /*[[${userDto.loginId}]]*/ 'defaultLoginId';
+
+                fetch(`/api/profile/${loginId}/deleteUser`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(password)
+                })
+                    .then(response => response.text().then(message => ({ message, ok: response.ok })))
+                    .then(({ message, ok }) => {
+                        alert(message);
+                        if (ok && message === '회원탈퇴가 완료됐습니다.') {
+                            window.location.href = '/api/logout';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+    });
+
     function toggle(element, fieldName) {
         element.classList.toggle('on');
         const checkbox = document.getElementById(fieldName);

@@ -65,6 +65,10 @@ public class FollowService {
                 .collect(Collectors.toList());
     }
 
+    public void deleteByUser(User user) {
+        followRepository.deleteByUser(user);
+    }
+
 
     @Transactional(readOnly = true)
     public int getFollowingCount(Long blogId) {

@@ -7,11 +7,14 @@ import hello.velogclone.domain.user.service.UserService;
 import hello.velogclone.global.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +30,7 @@ public class UserController {
     private final UserService userService;
     private final UserDetailsServiceImpl userDetailsService;
     private final ProfileImageService profileImageService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/api/signup")
     public String toSignUp(Model model) {
@@ -145,6 +149,32 @@ public class UserController {
             redirectAttributes.addFlashAttribute("error", "프로필 이미지 삭제 중 오류가 발생했습니다.");
             return "redirect:/api/profile/" + loginId;
         }
+    }
+
+    @ResponseBody
+    @DeleteMapping("/api/profile/{loginId}/deleteUser")
+    public ResponseEntity<String> deleteUser(@PathVariable("loginId") String loginId, @RequestBody String password, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.findUserEntityByLoginId(loginId);
+
+        // 디버그 로그 추가
+        log.info("Login ID from URL: " + loginId);
+        log.info("Login ID from UserDetails: " + userDetails.getUsername());
+        log.info("Provided Password: " + password);
+        log.info("Stored Password: " + user.getPassword());
+
+        // 로그인 ID가 일치하는지 확인
+        if (!userDetails.getUsername().equals(loginId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인된 사용자와 요청된 사용자가 일치하지 않습니다.");
+        }
+
+        // 비밀번호가 일치하는지 확인
+        if (passwordEncoder.matches(password.replace("\"", ""), user.getPassword())) {
+            userService.deleteUser(user);
+            return ResponseEntity.ok("회원탈퇴가 완료됐습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
+        }
+
     }
 
 }

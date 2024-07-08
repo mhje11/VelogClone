@@ -53,5 +53,16 @@
         loadFollowers();
     });
 </script>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        /*<![CDATA[*/
+        const error = /*[[${error}]]*/ 'null';
+        if (error !== null) {
+            alert(error);
+        }
+        /*]]>*/
+    });
+</script>
 </body>
 </html>

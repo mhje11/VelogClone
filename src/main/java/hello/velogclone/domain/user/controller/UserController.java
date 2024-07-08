@@ -117,6 +117,7 @@ public class UserController {
 
             if (!profileImage.isEmpty()) {
                 try {
+                    profileImageService.deleteExistingProfileImage(userDto);
                     profileImageService.uploadProfileImage(userDto, profileImage);
                 } catch (IOException e) {
                     log.info("파일 업로드 오류{}", e.getMessage());
@@ -125,7 +126,7 @@ public class UserController {
                 }
             }
 
-            redirectAttributes.addFlashAttribute("message", "수정이 성공적으로 됐습니다.");
+            redirectAttributes.addFlashAttribute("error", "수정이 성공적으로 됐습니다.");
             return "redirect:/";
         } catch (Exception e) {
             log.error("프로필 수정 중 오류 발생", e);

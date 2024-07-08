@@ -29,6 +29,7 @@ public class SecurityConfig {
                                 .requestMatchers("/error404").permitAll()
                                 .requestMatchers(("/error/**")).permitAll()
                                 .requestMatchers("/home/posts").permitAll()
+                                .requestMatchers("/api/blogs/{blogId}/series-list", "/api/blogs/{blogId}/series/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .formLogin(formLogin ->

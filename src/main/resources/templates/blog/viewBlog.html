@@ -20,7 +20,12 @@
         <a th:href="@{/api/blogs/{blogId}/create(blogId=${blogId})}">새 게시글 작성</a>
     </div>
 
-    <h2>게시글 목록</h2>
+    <div class="content-section">
+        <a th:href="@{/api/blogs/{blogId}(blogId=${blogId})}">최신글</a>
+        <a th:href="@{/api/blogs/{blogId}/series-list(blogId=${blogId})}">시리즈</a>
+    </div>
+
+    <h2> </h2>
     <div id="posts-container">
         <div th:each="post : ${posts}" class="post-card">
             <img th:src="${post.thumbnailUrl}" class="post-thumbnail" alt="썸네일 이미지">

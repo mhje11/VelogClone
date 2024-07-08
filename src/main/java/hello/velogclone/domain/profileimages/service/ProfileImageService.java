@@ -32,14 +32,6 @@ public class ProfileImageService {
 
     public void uploadProfileImage(UserDto userDto, MultipartFile file) throws IOException {
 
-//        if (userDto.getProfileImageUrl() != null) {
-//            Optional<ProfileImage> url = profileImageRepository.findByUrl(userDto.getProfileImageUrl());
-//            User user = userRepository.findByLoginId(userDto.getLoginId()).orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
-//            profileImageRepository.delete(url.get());
-//            String imagePathString = "src/main/resources/static" + user.getProfileImage().getUrl();
-//            Path existingImagePath = Paths.get(imagePathString);
-//            Files.deleteIfExists(existingImagePath);
-//        }
         String cleanedFileName = cleanFileName(userDto.getLoginId() + "_" + file.getOriginalFilename());
         String imagePathString = "src/main/resources/static/images/profiles" + File.separator + cleanedFileName;
         Path imagePath = Paths.get(imagePathString);

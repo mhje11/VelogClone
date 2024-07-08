@@ -166,3 +166,20 @@ h1, h2 {
 .action-buttons a:hover, .action-buttons button:hover {
     background-color: #dee2e6;
 }
+
+.content-section {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.content-section a {
+    text-decoration: none;
+    color: #20c997;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.content-section a:hover {
+    text-decoration: underline;
+}

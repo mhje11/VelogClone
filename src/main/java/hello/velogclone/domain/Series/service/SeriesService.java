@@ -1,6 +1,7 @@
 package hello.velogclone.domain.Series.service;
 
 import hello.velogclone.domain.Series.dto.SeriesDto;
+import hello.velogclone.domain.Series.dto.SeriesThumbnailDto;
 import hello.velogclone.domain.Series.entity.Series;
 import hello.velogclone.domain.Series.repository.SeriesRepository;
 import hello.velogclone.domain.blog.entity.Blog;
@@ -8,6 +9,8 @@ import hello.velogclone.domain.blog.repository.BlogRepository;
 import hello.velogclone.global.exception.BlogNotFoundException;
 import hello.velogclone.global.exception.SeriesNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,11 @@ public class SeriesService {
                 .map(SeriesDto::seriesToDto)
                 .collect(Collectors.toList());
 
+    }
+
+    public Page<SeriesThumbnailDto> findAllSeriesByBlogIdIncludeImage(Long blogId, Pageable pageable) {
+        Page<Series> seriesPage = seriesRepository.findAllByBlogId(blogId, pageable);
+        return seriesPage.map(SeriesThumbnailDto::seriesToThumbnailDto);
     }
 
     public void createSeries(SeriesDto seriesDto, Long blogId) {

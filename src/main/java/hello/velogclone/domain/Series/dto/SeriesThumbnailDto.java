@@ -34,10 +34,10 @@ public class SeriesThumbnailDto {
         if (posts == null || posts.isEmpty()) {
             return "/images/posts/default_thumbnail.png";
         }
-        Post firstPost = posts.get(0); // 리스트의 첫 번째 요소를 가져옵니다.
-        if (firstPost.getPostImages() == null || firstPost.getPostImages().isEmpty()) {
+        Post LastPost = posts.getLast();
+        if (LastPost.getPostImages() == null || LastPost.getPostImages().isEmpty()) {
             return "/images/posts/default_thumbnail.png";
         }
-        return firstPost.getPostImages().get(0).getUrl(); // 이미지 리스트의 첫 번째 요소를 가져옵니다.
+        return LastPost.getPostImages().getLast().getUrl();
     }
 }

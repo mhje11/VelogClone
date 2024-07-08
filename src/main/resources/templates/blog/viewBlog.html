@@ -8,8 +8,8 @@
 
 </head>
 <body>
+<header th:replace="fragments/login :: navbar"></header>
 <main>
-    <header th:replace="fragments/login :: navbar"></header>
     <h1 th:text="${blog.title}">블로그 제목</h1>
     <div class="action-buttons">
         <a th:href="@{/api/blogs/{blogId}/edit(blogId=${blogId})}">블로그 수정</a>

@@ -143,9 +143,11 @@ public class PostService {
         String profileImageUrl = (post.getUser().getProfileImage() != null && post.getUser().getProfileImage().getUrl() != null) ? post.getUser().getProfileImage().getUrl()
                 : "/images/profiles/default-profile.png";
 
+        Long seriesId = post.getSeries() != null ? post.getSeries().getId() : null;
+
         return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getBlog().getId(), likeCount, tags
                 , seriesName, post.isTemporal(), thumbnailUrl
-                , post.getCreatedAt(), commentCount, post.getUser().getLoginId(), profileImageUrl);
+                , post.getCreatedAt(), commentCount, post.getUser().getLoginId(), profileImageUrl, seriesId);
     }
 
     public String cleanFileName(String fileName) {

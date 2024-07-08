@@ -30,6 +30,7 @@ public class PostResponseDto {
     private Long commentsCount;
     private String loginId;
     private String profileImageUrl;
+    private Long seriesId;
 
 
     public PostResponseDto(Post post) {
@@ -46,6 +47,7 @@ public class PostResponseDto {
         this.likes = post.getLikes() == null ? 0L : (long) post.getLikes().size();
         this.loginId = post.getUser().getLoginId();
         this.profileImageUrl =  (post.getUser().getProfileImage() != null && post.getUser().getProfileImage().getUrl() != null) ? post.getUser().getProfileImage().getUrl() : "images/profiles/default-profile.png";
+        this.seriesId = post.getSeries() != null ? post.getSeries().getId() : null;
 
     }
 

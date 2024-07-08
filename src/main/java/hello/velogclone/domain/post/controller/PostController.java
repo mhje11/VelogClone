@@ -7,7 +7,6 @@ import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.entity.Post;
 import hello.velogclone.domain.post.service.PostService;
 import hello.velogclone.domain.postimage.entity.PostImage;
-import hello.velogclone.domain.postimage.repository.PostImageRepository;
 import hello.velogclone.domain.postimage.service.PostImageService;
 import hello.velogclone.domain.tag.entity.Tag;
 import hello.velogclone.domain.tag.service.TagService;
@@ -33,8 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 
 @Controller

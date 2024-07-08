@@ -200,6 +200,7 @@ main {
 .post-author {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 20px;
     border-bottom: 1px solid #e0e0e0; /* 연한 구분선 추가 */
     padding-bottom: 10px;
@@ -220,4 +221,21 @@ main {
 
 .post-author a:hover {
     text-decoration: underline; /* 호버 시 밑줄 표시 */
+}
+
+.post-author .post-date {
+    margin-left: auto; /* 추가 */
+    font-size: 0.875rem;
+    color: #868e96;
+}
+
+.post-series a {
+    font-size: 1.25rem;
+    color: #20c997;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.post-series a:hover {
+    text-decoration: underline;
 }

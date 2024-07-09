@@ -55,6 +55,7 @@ public class PostRestController {
 
     @DeleteMapping("/api/blogs/{blogId}/edit/post/{postId}/delete")
     public ResponseEntity<String> deletePost(@PathVariable("postId") Long postId, @AuthenticationPrincipal UserDetails userDetails) {
+
         postService.deletePost(postId, userDetails.getUsername());
         return ResponseEntity.ok("게시글이 성공적으로 삭제됐습니다.");
     }
@@ -69,5 +70,10 @@ public class PostRestController {
         return ResponseEntity.ok(post);
     }
 
+    @GetMapping("/api/admin/allPost")
+    public ResponseEntity<List<PostResponseDto>> showAllPosts() {
+        List<PostResponseDto> posts = postService.findAllPosts();
+        return ResponseEntity.ok(posts);
+    }
 
 }

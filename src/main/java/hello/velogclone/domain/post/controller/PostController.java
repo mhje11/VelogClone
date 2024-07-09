@@ -189,20 +189,21 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/delete")
-    public String deletePost(@PathVariable("blogId") Long blogId,
-                             @PathVariable("postId") Long postId,
-                             @AuthenticationPrincipal UserDetails userDetails,
-                             Model model
-    , RedirectAttributes redirectAttributes) {
-
+    public String deletePost(@PathVariable("blogId") Long blogId, @PathVariable("postId") Long postId,
+                             @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
             redirectAttributes.addFlashAttribute("error", "로그인후 이용 가능합니다.");
             return "redirect:/api/login";
         }
-
+        User user = userRepository.findByLoginId(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다."));
+        if (user.getRole().getDescription().equals("admin")) {
+            postImageService.deleteImagesByPostId(postId);
+            postService.deletePost(postId, userDetails.getUsername());
+            redirectAttributes.addFlashAttribute("error", "게시글 삭제 완료");
+            return "redirect:/api/blogs/" + blogId;
+        }
         Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(() -> new BlogNotFoundException("해당 블로그를 찾을 수 없습니다."));
-
         if (!blog.getUser().getLoginId().equals(userDetails.getUsername())) {
             redirectAttributes.addFlashAttribute("error", "삭제할 권한이 없습니다.");
             return "redirect:/api/blogs/" + blogId;
@@ -211,8 +212,6 @@ public class PostController {
         postService.deletePost(postId, userDetails.getUsername());
         redirectAttributes.addFlashAttribute("error", "게시글 삭제 완료");
         return "redirect:/api/blogs/" + blogId;
-
-
     }
 
     private Blog checkBlogAndUser(Long blogId, UserDetails userDetails) {

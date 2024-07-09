@@ -178,6 +178,20 @@ public class UserController {
 
     }
 
+    @GetMapping("/api/blogs/admin")
+    public String adminPageForm(@AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("message", "로그인 후 이용 가능합니다.");
+            return "redirect:/api/login";
+        }
+        User user = userService.findUserEntityByLoginId(userDetails.getUsername());
+        if (!user.getRole().getDescription().equals("admin")) {
+            redirectAttributes.addFlashAttribute("error", "접근 권한이 없습니다.");
+            return "redirect:/";
+        }
+        return "user/admin";
+    }
+
 }
 
 

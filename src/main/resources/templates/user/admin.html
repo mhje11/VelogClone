@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 페이지</title>
+    <link rel="stylesheet" href="/css/user/admin.css">
+    <link rel="stylesheet" href="/css/fragment/login.css">
+</head>
+<body>
+<header th:replace="fragments/login :: navbar"></header>
+
+<main>
+    <h1>게시글 목록</h1>
+    <div class="post-list">
+        <!-- 게시글 목록이 여기에 동적으로 추가됩니다. -->
+    </div>
+</main>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/api/admin/allPost')
+            .then(response => response.json())
+            .then(posts => {
+                const postList = document.querySelector('.post-list');
+                posts.forEach(post => {
+                    const postItem = document.createElement('div');
+                    postItem.classList.add('post-item');
+                    postItem.innerHTML = `
+                        <div class="post-title">${post.title}</div>
+                        <div class="post-author">${post.loginId}</div>
+                        <div class="post-date">${new Date(post.createdAt).toLocaleDateString()}</div>
+                        <button class="btn delete-btn" data-blog-id="${post.blogId}" data-post-id="${post.id}">삭제</button>
+                    `;
+                    postList.appendChild(postItem);
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const blogId = this.dataset.blogId;
+                        const postId = this.dataset.postId;
+                        if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+                            fetch(`/api/blogs/${blogId}/${postId}/delete`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                                .then(response => response.text())
+                                .then(message => {
+                                    alert("게시글 삭제 완료");
+                                    location.reload();
+                                })
+                                .catch(error => alert('삭제 중 오류가 발생했습니다.'));
+                        }
+                    });
+                });
+            })
+            .catch(error => console.error('게시글 목록 로드 중 오류 발생:', error));
+    });
+</script>
+
+</body>
+</html>

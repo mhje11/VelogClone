@@ -9,6 +9,7 @@ import hello.velogclone.domain.post.service.PostService;
 import hello.velogclone.domain.user.dto.UserDto;
 import hello.velogclone.domain.user.service.UserService;
 import hello.velogclone.global.exception.UnauthorizedException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

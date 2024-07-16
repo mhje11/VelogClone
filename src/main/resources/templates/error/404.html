@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>404 - Page Not Found</title>
+    <link rel="stylesheet" href="/css/error/404.css">
+    <link rel="stylesheet" th:href="@{/css/fragment/login.css}">
+
 </head>
 <body>
-<h1>404 - Page Not Found</h1>
-<p>요청하신 페이지를 찾을 수 없습니다.</p>
+<header th:replace="fragments/login :: navbar"></header>
+<main>
+    <div class="error-container">
+        <h1>404 - Page Not Found</h1>
+        <p>요청하신 페이지를 찾을 수 없습니다.</p>
+        <a href="/" class="home-link">메인 화면</a>
+    </div>
+</main>
 </body>
 </html>

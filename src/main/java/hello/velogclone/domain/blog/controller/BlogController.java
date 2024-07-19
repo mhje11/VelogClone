@@ -6,16 +6,11 @@ import hello.velogclone.domain.blog.service.BlogService;
 import hello.velogclone.domain.follow.service.FollowService;
 import hello.velogclone.domain.post.dto.PostResponseDto;
 import hello.velogclone.domain.post.service.PostService;
-import hello.velogclone.domain.user.dto.UserDto;
-import hello.velogclone.domain.user.service.UserService;
-import hello.velogclone.global.exception.UnauthorizedException;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +38,7 @@ public class BlogController {
             redirectAttributes.addFlashAttribute("error", "이미 블로그가 존재합니다.");
             return "redirect:/";
         }
+
         model.addAttribute("blog", new BlogDto());
         return "blog/createBlogForm";
     }
@@ -83,7 +79,7 @@ public class BlogController {
         }
         Optional<Blog> blog = blogService.findBlogByUserLoginId(userDetails.getUsername());
         if (blog.isEmpty()) {
-            redirectAttributes.addFlashAttribute("blogExistError", "먼저 블로그를 생성하세요");
+            redirectAttributes.addFlashAttribute("error", "먼저 블로그를 생성하세요");
             return "redirect:/";
         }
         return "redirect:/api/blogs/" + blog.get().getId();

@@ -36,7 +36,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    //마크다운 Html로 바꾸기
+    //markdown to html
     implementation 'org.commonmark:commonmark:0.22.0'
     implementation 'org.commonmark:commonmark-ext-gfm-tables:0.22.0'
     implementation 'org.commonmark:commonmark-ext-gfm-strikethrough:0.22.0'
@@ -44,12 +44,12 @@ dependencies {
     implementation 'org.commonmark:commonmark-ext-autolink:0.22.0'
     implementation 'org.commonmark:commonmark-ext-heading-anchor:0.22.0'
 
+    //html to markdown
+    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
 
     //서버측에서 이미지 리사이즈하기
     implementation 'net.coobird:thumbnailator:0.4.14'
 
-    //html to markdown 하기 위해
-    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
 
 
 

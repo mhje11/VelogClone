@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Comparator;
 import java.util.List;
 
 @NoArgsConstructor
@@ -34,10 +35,11 @@ public class SeriesThumbnailDto {
         if (posts == null || posts.isEmpty()) {
             return "/images/posts/default_thumbnail.png";
         }
-        Post LastPost = posts.getLast();
-        if (LastPost.getPostImages() == null || LastPost.getPostImages().isEmpty()) {
+        posts.sort(Comparator.comparing(Post::getCreatedAt).reversed());
+        Post latestPostInSeries = posts.get(0); // 해당 시리즈에서 가장 최신 포스트
+        if (latestPostInSeries.getPostImages() == null || latestPostInSeries.getPostImages().isEmpty()) {
             return "/images/posts/default_thumbnail.png";
         }
-        return LastPost.getPostImages().getLast().getUrl();
+        return latestPostInSeries.getPostImages().get(0).getUrl();
     }
 }

@@ -1,7 +1,11 @@
 package hello.velogclone.domain.follow.controller;
 
+import hello.velogclone.domain.blog.entity.Blog;
+import hello.velogclone.domain.blog.service.BlogService;
 import hello.velogclone.domain.follow.dto.FollowDto;
 import hello.velogclone.domain.follow.service.FollowService;
+import hello.velogclone.domain.user.entity.User;
+import hello.velogclone.domain.user.service.UserService;
 import hello.velogclone.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FollowRestController {
     private final FollowService followService;
+    private final UserService userService;
+    private final BlogService blogService;
 
     @PostMapping("/follow")
     public ResponseEntity<String> followBlog(@PathVariable("blogId") Long blogId, @AuthenticationPrincipal UserDetails userDetails) {
@@ -35,7 +41,10 @@ public class FollowRestController {
 
     @GetMapping("/following/List")
     public ResponseEntity<List<FollowDto>> getFollowings(@PathVariable("blogId") Long blogId) {
-        List<FollowDto> followings = followService.findAllFollowingsByBlogId(blogId);
+
+        Blog blog = blogService.getBlogById(blogId);
+        User user = userService.findUserEntityByLoginId(blog.getUser().getLoginId());
+        List<FollowDto> followings = followService.findAllFollowingsByUser(user);
         return ResponseEntity.ok(followings);
     }
 }

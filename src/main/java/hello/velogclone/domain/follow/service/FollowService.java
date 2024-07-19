@@ -54,16 +54,16 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true)
-    public List<FollowDto> findAllFollowingsByBlogId(Long blogId) {
-        Blog blog = blogRepository.findById(blogId).get();
-        return followRepository.findByUser(blog.getUser()).stream()
+    public List<FollowDto> findAllFollowingsByUser(User user) {
+        return followRepository.findByUser(user).stream()
                 .map(follow -> {
-                    String profileImageUrl = Objects.nonNull(follow.getUser().getProfileImage()) ?
-                            follow.getUser().getProfileImage().getUrl() : "/images/profiles/default-profile.png";
-                    return new FollowDto(blog.getUser().getLoginId(), profileImageUrl);
+                    String profileImageUrl = Objects.nonNull(follow.getBlog().getUser().getProfileImage()) ?
+                            follow.getBlog().getUser().getProfileImage().getUrl() : "/images/profiles/default-profile.png";
+                    return new FollowDto(follow.getBlog().getUser().getLoginId(), profileImageUrl);
                 })
                 .collect(Collectors.toList());
     }
+
 
     public void deleteByUser(User user) {
         followRepository.deleteByUser(user);

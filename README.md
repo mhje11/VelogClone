@@ -120,3 +120,11 @@
     - 해당 카드 클릭 시 시리즈별 포스트가 나타남
 
 </details>
+
+<details>
+<summary>ERD</summary>
+
+1. **ERD**
+<img src="https://github.com/user-attachments/assets/673c8164-ff0c-4533-b372-e77225377e85" alt="image" width="100%" height="100%">
+
+</details>

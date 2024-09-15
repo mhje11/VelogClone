@@ -1,14 +1,26 @@
 # 프로젝트 기능 목록
 
+## 메인 페이지
+로그인 전
+   ![image](https://github.com/user-attachments/assets/e49cad67-6f60-4125-be1a-136e0e3596a3)
+
+로그인 후
+  ![image](https://github.com/user-attachments/assets/d3fd7713-b6ef-4016-b789-4749186c4a69)
+
+
 ## User 관련
 1. **회원가입**
-2. **로그인**: 스프링 시큐리티 세션 이용
-3. **회원탈퇴 구현**
-4. **유저의 역할 관련**
+   ![image](https://github.com/user-attachments/assets/675459dc-b1b9-4c3d-997e-37daca0633fe)
+
+3. **로그인**: 스프링 시큐리티 세션 이용
+![image](https://github.com/user-attachments/assets/590bd344-d5af-4c20-9249-56da3f679c9f)
+
+4. **회원탈퇴 구현**
+5. **유저의 역할 관련**
     - Role을 테이블 대신 Enum으로 관리
     - 회원가입 창에서 역할 부여
-5. **관리자 페이지 구현** : 관리자는 모든 게시물 댓글에 대한 삭제 권한을 갖고 있음
-6. **프로필 이미지 업로드 구현**
+6. **관리자 페이지 구현** : 관리자는 모든 게시물 댓글에 대한 삭제 권한을 갖고 있음
+7. **프로필 이미지 업로드 구현**
 
 ## Blog 관련
 1. **블로그 관리 기능**

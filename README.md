@@ -3,7 +3,7 @@ VelogClone 프로젝트는 Velog 플랫폼을 클론하여 블로그 기능을 �
 이 프로젝트의 주요 목적은 사용자 인증, 게시글 관리, 팔로우/팔로잉, 댓글 및 좋아요와 같은 블로그 운영에 필요한 핵심 기능을 학습하고 구현하는 것입니다.
 
 ## 기술 스택
-- **프론트엔드**: ThymeLeaf
+- **프론트엔드**: ThymeLeaf
 - **백엔드**: Spring Boot, Spring Security, JPA, MySQL
 - **기타 도구**: ToastUI, FlexMark, CommonMark
 

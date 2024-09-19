@@ -20,7 +20,8 @@ git clone https://github.com/your-repo/VelogClone.git
 ```
 
 2. **application.yml 설정**
-MySQL설치후 환경변수 설정
+
+  MySQL설치후 환경변수 설정
 
 
 # 프로젝트 기능 목록

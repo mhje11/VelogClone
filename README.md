@@ -19,6 +19,9 @@ VelogClone 프로젝트를통해 벨로그의 블로그 기능을 구현했습�
 git clone https://github.com/your-repo/VelogClone.git
 ```
 
+2. **application.yml 설정**
+MySQL설치후 환경변수 설정
+
 
 # 프로젝트 기능 목록
 

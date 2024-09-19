@@ -2,6 +2,11 @@
 VelogClone 프로젝트를통해 벨로그의 블로그 기능을 구현했습니다.
 이 프로젝트를 통해 사용자 인증, 게시글 관리, 팔로우/팔로잉, 댓글 및 좋아요 같은 핵심 기능을 학습했습니다.
 
+## 시스템 아키텍처
+![image](https://github.com/user-attachments/assets/6676ace4-938c-4416-9775-740b1327dcb9)
+
+
+
 ## 기술 스택
 - **프론트엔드**: ThymeLeaf
 - **백엔드**: Spring Boot, Spring Security, JPA, MySQL
